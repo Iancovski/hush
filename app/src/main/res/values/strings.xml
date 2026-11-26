@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name" translatable="false">Hush</string>
+    <string name="app_tagline">Silently blocks calls from numbers that are not in your contacts.</string>
+</resources>
