@@ -41,4 +41,14 @@ class BlockedCallDaoTest {
         assertEquals(listOf(3_000L, 2_000L, 1_000L), calls.map { it.receivedAt })
         assertEquals(listOf("3", null, "1"), calls.map { it.number })
     }
+
+    @Test
+    fun deleteAllRemovesEveryCall() = runTest {
+        dao.insert(BlockedCall(number = "1", normalizedNumber = "+551", receivedAt = 1_000L))
+        dao.insert(BlockedCall(number = "2", normalizedNumber = "+552", receivedAt = 2_000L))
+
+        dao.deleteAll()
+
+        assertEquals(emptyList<BlockedCall>(), dao.observeAll().first())
+    }
 }

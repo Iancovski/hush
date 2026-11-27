@@ -18,3 +18,6 @@ data object SetupNotifications : SetupKey
 
 @Serializable
 data object Home : NavKey
+
+@Serializable
+data object History : NavKey

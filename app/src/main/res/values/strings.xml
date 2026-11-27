@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name" translatable="false">Hush</string>
 
+    <!-- Common -->
+    <string name="navigate_back">Back</string>
+    <string name="cancel">Cancel</string>
+
     <!-- Setup wizard -->
     <string name="setup_continue">Continue</string>
     <string name="setup_step_indicator">Step %1$d of %2$d</string>
@@ -26,6 +30,19 @@
     <string name="home_protection_off_title">Protection inactive</string>
     <string name="home_protection_on_description">Blocking calls from unsaved numbers</string>
     <string name="home_protection_off_description">Allowing calls from unsaved numbers</string>
+
+    <!-- History -->
+    <string name="history_title">Blocked call history</string>
+    <string name="history_empty_title">No blocked calls</string>
+    <string name="history_empty_description">Calls blocked by Hush show up here.</string>
+    <string name="history_today">Today</string>
+    <string name="history_yesterday">Yesterday</string>
+    <string name="history_private_number">Private number</string>
+    <string name="history_more_options">More options</string>
+    <string name="history_clear">Clear history</string>
+    <string name="history_clear_dialog_title">Clear history?</string>
+    <string name="history_clear_dialog_text">All blocked calls will be removed from Hush. This cannot be undone.</string>
+    <string name="history_clear_confirm">Clear</string>
 
     <!-- Permissions -->
     <string name="permission_call_screening_title">Caller ID &amp; spam app</string>

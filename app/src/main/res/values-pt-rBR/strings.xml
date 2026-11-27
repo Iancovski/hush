@@ -1,4 +1,8 @@
 <resources>
+    <!-- Common -->
+    <string name="navigate_back">Voltar</string>
+    <string name="cancel">Cancelar</string>
+
     <!-- Setup wizard -->
     <string name="setup_continue">Continuar</string>
     <string name="setup_step_indicator">Passo %1$d de %2$d</string>
@@ -24,6 +28,19 @@
     <string name="home_protection_off_title">Proteção inativa</string>
     <string name="home_protection_on_description">Bloqueando chamadas de números não salvos</string>
     <string name="home_protection_off_description">Permitindo chamadas de números não salvos</string>
+
+    <!-- History -->
+    <string name="history_title">Histórico de bloqueios</string>
+    <string name="history_empty_title">Nenhuma chamada bloqueada</string>
+    <string name="history_empty_description">As chamadas bloqueadas pelo Hush aparecem aqui.</string>
+    <string name="history_today">Hoje</string>
+    <string name="history_yesterday">Ontem</string>
+    <string name="history_private_number">Número privado</string>
+    <string name="history_more_options">Mais opções</string>
+    <string name="history_clear">Limpar histórico</string>
+    <string name="history_clear_dialog_title">Limpar histórico?</string>
+    <string name="history_clear_dialog_text">Todas as chamadas bloqueadas serão removidas do Hush. Isso não pode ser desfeito.</string>
+    <string name="history_clear_confirm">Limpar</string>
 
     <!-- Permissions -->
     <string name="permission_call_screening_title">App identificador de chamada e spam</string>

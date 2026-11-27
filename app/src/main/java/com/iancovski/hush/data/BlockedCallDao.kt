@@ -14,4 +14,7 @@ interface BlockedCallDao {
     /** Newest first, as the history shows them. */
     @Query("SELECT * FROM blocked_calls ORDER BY received_at DESC")
     fun observeAll(): Flow<List<BlockedCall>>
+
+    @Query("DELETE FROM blocked_calls")
+    suspend fun deleteAll()
 }

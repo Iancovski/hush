@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Material Symbols "chevron_right", outlined, weight 300, 24px (google/material-design-icons, Apache 2.0). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:autoMirrored="true"
+    android:viewportWidth="960"
+    android:viewportHeight="960">
+    <!-- The official SVG uses viewBox="0 -960 960 960", so the path is kept as is and moved down. -->
+    <group android:translateY="960">
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="m517.85-480-184-184L376-706.15 602.15-480 376-253.85 333.85-296l184-184Z" />
+    </group>
+</vector>

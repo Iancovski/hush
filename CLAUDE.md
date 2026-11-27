@@ -120,8 +120,8 @@ Gradle runs on the JDK bundled with Android Studio (`JAVA_HOME` points to `Andro
   | Red | `#F87171` | Negative state and errors, such as inactive protection | `error` |
 
 - Gradients use `MaterialTheme.colorScheme.brandGradient` (purple to lilac). Do not build gradients from raw colors.
-- Highlighted cards (such as the Home protection card) use `cardGradient` as background (a faint lilac tint at the top, 15% over `surfaceContainer`, fading down to `surfaceContainer`) and `cardHighlight` as a 1dp border (lilac at low opacity: brightest at the top edge, fading to a faint outline on the sides and bottom) for a sense of elevation. Keep the tint subtle: text and controls on the card must keep their contrast.
-- Text on `primary` uses `onPrimary` (pure white, the best contrast available on the main purple). For text links or colored text on the background, prefer `secondary` (lilac): `primary` on the dark background stays below the 4.5:1 text contrast ratio.
+- Highlighted cards (such as the Home protection card) use `cardGradient` as background (a faint lilac tint at the top, 15% over `surfaceContainer`, fading down to `surfaceContainer`) and `cardHighlight` as a 1dp border (lilac at low opacity: brightest at the top edge, fading to a faint outline on the sides and bottom) for a sense of elevation. Keep the tint subtle: text and controls on the card must keep their contrast. Other cards (such as the Home menu with the history button) are flat: `surfaceContainerLow`, no gradient and no border.
+- Text on `primary` uses `onPrimary` (pure white, the best contrast available on the main purple). For text links or colored text on the background, prefer `secondary` (lilac): `primary` on the dark background stays below the 4.5:1 text contrast ratio. This includes `TextButton`s (such as dialog buttons), which default to `primary`: pass `ButtonDefaults.textButtonColors(contentColor = secondary)`.
 - Typography is Inter, bundled as a variable font in `res/font/inter_variable.ttf` (license in `third_party/inter/`) and applied to the whole Material 3 type scale in `ui/theme/Type.kt`. Never use downloadable fonts.
 
 ### Navigation 3

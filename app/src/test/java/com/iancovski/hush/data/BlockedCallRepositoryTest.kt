@@ -1,22 +1,13 @@
 package com.iancovski.hush.data
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.iancovski.hush.testing.FakeBlockedCallDao
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class BlockedCallRepositoryTest {
-
-    private class FakeBlockedCallDao : BlockedCallDao {
-        val calls = MutableStateFlow<List<BlockedCall>>(emptyList())
-
-        override suspend fun insert(call: BlockedCall) {
-            calls.value = calls.value + call
-        }
-
-        override fun observeAll(): Flow<List<BlockedCall>> = calls
-    }
 
     private val dao = FakeBlockedCallDao()
 
@@ -27,7 +18,7 @@ class BlockedCallRepositoryTest {
         repository.record(number = "(11) 98765-4321", receivedAt = 1_000L)
 
         assertEquals(
-            listOf(BlockedCall(number = "(11) 98765-4321", normalizedNumber = "+5511987654321", receivedAt = 1_000L)),
+            listOf(BlockedCall(id = 1, number = "(11) 98765-4321", normalizedNumber = "+5511987654321", receivedAt = 1_000L)),
             dao.calls.value,
         )
     }
@@ -39,8 +30,19 @@ class BlockedCallRepositoryTest {
         repository.record(number = null, receivedAt = 1_000L)
 
         assertEquals(
-            listOf(BlockedCall(number = null, normalizedNumber = null, receivedAt = 1_000L)),
+            listOf(BlockedCall(id = 1, number = null, normalizedNumber = null, receivedAt = 1_000L)),
             dao.calls.value,
         )
+    }
+
+    @Test
+    fun `clearing removes every blocked call`() = runTest {
+        val repository = BlockedCallRepository(dao, normalizeNumber = { null })
+        repository.record(number = "1", receivedAt = 1_000L)
+        repository.record(number = "2", receivedAt = 2_000L)
+
+        repository.clear()
+
+        assertTrue(repository.blockedCalls.first().isEmpty())
     }
 }

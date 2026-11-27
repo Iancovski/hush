@@ -12,6 +12,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.iancovski.hush.R
 import com.iancovski.hush.ui.theme.HushTheme
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,6 +35,7 @@ class HomeScreenTest {
                 HomeScreen(
                     uiState = HomeUiState(isLoading = false, blockingEnabled = true),
                     onBlockingChange = { changedTo = it },
+                    onOpenHistory = {},
                 )
             }
         }
@@ -55,6 +57,7 @@ class HomeScreenTest {
                 HomeScreen(
                     uiState = HomeUiState(isLoading = false, blockingEnabled = false),
                     onBlockingChange = { changedTo = it },
+                    onOpenHistory = {},
                 )
             }
         }
@@ -66,5 +69,23 @@ class HomeScreenTest {
             .performClick()
 
         assertEquals(true, changedTo)
+    }
+
+    @Test
+    fun historyButtonOpensTheHistory() {
+        var opened = false
+        composeRule.setContent {
+            HushTheme {
+                HomeScreen(
+                    uiState = HomeUiState(isLoading = false, blockingEnabled = true),
+                    onBlockingChange = {},
+                    onOpenHistory = { opened = true },
+                )
+            }
+        }
+
+        composeRule.onNodeWithText(string(R.string.history_title)).performClick()
+
+        assertTrue(opened)
     }
 }
