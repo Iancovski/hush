@@ -36,6 +36,7 @@ app/src/main/java/com/iancovski/hush/
     ├── theme/           # Material 3 theme: Color.kt, Type.kt, Theme.kt
     ├── navigation/      # NavKeys and NavDisplay setup
     ├── components/      # composables shared by several screens (the notification mode selector)
+    ├── permissions/     # asking for the required permissions, shared by the wizard and Home
     └── setup/ home/ history/ allowlist/ notifications/   # one package per screen
 app/src/test/            # JVM unit tests
 app/src/androidTest/     # instrumented tests
@@ -171,7 +172,7 @@ Gradle runs on the JDK bundled with Android Studio (`JAVA_HOME` points to `Andro
 
 ### Permissions and privacy
 
-- Required: `READ_CONTACTS` and the `ROLE_CALL_SCREENING` role. Check both at runtime every time (users can revoke them) and request them with Activity Result APIs. They are first requested in the setup wizard, which does not move on until both are granted. When Android no longer shows a dialog, open the matching system settings screen instead: default apps (`ACTION_MANAGE_DEFAULT_APPS_SETTINGS`) for the role, app info for contacts.
+- Required: `READ_CONTACTS` and the `ROLE_CALL_SCREENING` role. Check both at runtime every time (users can revoke them) and request them with Activity Result APIs. They are first requested in the setup wizard, which does not move on until both are granted; the wizard only runs once. Afterwards, if one is missing, Home shows protection as inactive (the stored switch value is kept, so protection resumes when the permission is back), and turning the switch on opens a dialog that lists the missing permissions and asks for them with the same flow as the wizard (`ui/permissions/`). When Android no longer shows a dialog, open the matching system settings screen instead: default apps (`ACTION_MANAGE_DEFAULT_APPS_SETTINGS`) for the role, app info for contacts.
 - Optional: `POST_NOTIFICATIONS` (Android 13+). Request it only when the user picks a notification mode other than `NEVER`. If it is not granted, behave as `NEVER` without changing the stored setting.
 - **Never** add `READ_CALL_LOG`, `READ_PHONE_STATE`, `ANSWER_PHONE_CALLS`, or `CALL_PHONE`. Hush keeps its own history. `READ_CALL_LOG` is a restricted Play Store permission.
 - No network access: the manifest has no `INTERNET` permission and no data leaves the device.

@@ -28,6 +28,9 @@
     <string name="home_protection_off_title">Proteção inativa</string>
     <string name="home_protection_on_description">Bloqueando chamadas de números não salvos</string>
     <string name="home_protection_off_description">Permitindo chamadas de números não salvos</string>
+    <string name="home_protection_missing_permissions">Faltam permissões para bloquear chamadas</string>
+    <string name="home_permissions_dialog_title">Permissões necessárias</string>
+    <string name="home_permissions_dialog_text">Para ativar a proteção, o Hush precisa das seguintes permissões:</string>
     <string name="home_blocked_calls_title">Chamadas bloqueadas</string>
     <string name="home_blocked_calls_period">Últimos 7 dias</string>
 

@@ -23,11 +23,14 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -46,6 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.iancovski.hush.R
+import com.iancovski.hush.ui.permissions.PermissionsUiState
 import com.iancovski.hush.ui.theme.HushTheme
 import com.iancovski.hush.ui.theme.cardGradient
 import com.iancovski.hush.ui.theme.cardHighlight
@@ -56,6 +60,8 @@ import com.iancovski.hush.ui.theme.success
 fun HomeScreen(
     uiState: HomeUiState,
     onBlockingChange: (Boolean) -> Unit,
+    onRequestPermissions: () -> Unit,
+    onPermissionsDialogDismiss: () -> Unit,
     onOpenHistory: () -> Unit,
     onOpenAllowlist: () -> Unit,
     onOpenNotificationSettings: () -> Unit,
@@ -79,7 +85,8 @@ fun HomeScreen(
             // The stored value arrives almost at once. Waiting for it avoids showing the wrong state.
             if (!uiState.isLoading) {
                 ProtectionCard(
-                    enabled = uiState.blockingEnabled,
+                    enabled = uiState.protectionActive,
+                    permissionsMissing = !uiState.permissions.allGranted,
                     onEnabledChange = onBlockingChange,
                 )
                 Spacer(Modifier.height(16.dp))
@@ -117,6 +124,59 @@ fun HomeScreen(
             }
         }
     }
+
+    if (uiState.showPermissionsDialog) {
+        MissingPermissionsDialog(
+            permissions = uiState.permissions,
+            onGrantClick = onRequestPermissions,
+            onDismiss = onPermissionsDialogDismiss,
+        )
+    }
+}
+
+/** Shown when the user tries to turn protection on while a required permission is missing. */
+@Composable
+private fun MissingPermissionsDialog(
+    permissions: PermissionsUiState,
+    onGrantClick: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val buttonColors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.secondary)
+    val missing = buildList {
+        if (!permissions.callScreeningRoleHeld) add(stringResource(R.string.permission_call_screening_title))
+        if (!permissions.contactsGranted) add(stringResource(R.string.permission_contacts_title))
+    }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        modifier = modifier,
+        title = { Text(stringResource(R.string.home_permissions_dialog_title)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(stringResource(R.string.home_permissions_dialog_text))
+                missing.forEach { permission -> Text("•  $permission") }
+                if (permissions.needsSystemSettings) {
+                    Text(stringResource(R.string.setup_permissions_settings_hint))
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onGrantClick, colors = buttonColors) {
+                Text(
+                    stringResource(
+                        if (permissions.needsSystemSettings) {
+                            R.string.setup_permissions_open_settings
+                        } else {
+                            R.string.setup_permissions_grant
+                        },
+                    ),
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss, colors = buttonColors) { Text(stringResource(R.string.cancel)) }
+        },
+    )
 }
 
 /**
@@ -150,6 +210,7 @@ private fun HomeCard(
 @Composable
 private fun ProtectionCard(
     enabled: Boolean,
+    permissionsMissing: Boolean,
     onEnabledChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -179,10 +240,11 @@ private fun ProtectionCard(
                 Spacer(Modifier.height(2.dp))
                 Text(
                     text = stringResource(
-                        if (enabled) {
-                            R.string.home_protection_on_description
-                        } else {
-                            R.string.home_protection_off_description
+                        when {
+                            enabled -> R.string.home_protection_on_description
+                            // Say why calls go through, instead of suggesting the user turned it off.
+                            permissionsMissing -> R.string.home_protection_missing_permissions
+                            else -> R.string.home_protection_off_description
                         },
                     ),
                     style = MaterialTheme.typography.bodyMedium,
@@ -326,6 +388,8 @@ private fun HomeScreenEnabledPreview() {
         HomeScreen(
             uiState = HomeUiState(isLoading = false, blockingEnabled = true, blockedPerDay = listOf(2, 5, 1, 4, 6, 9, 3)),
             onBlockingChange = {},
+            onRequestPermissions = {},
+            onPermissionsDialogDismiss = {},
             onOpenHistory = {},
             onOpenAllowlist = {},
             onOpenNotificationSettings = {},
@@ -340,6 +404,30 @@ private fun HomeScreenDisabledPreview() {
         HomeScreen(
             uiState = HomeUiState(isLoading = false, blockingEnabled = false, blockedPerDay = List(7) { 0 }),
             onBlockingChange = {},
+            onRequestPermissions = {},
+            onPermissionsDialogDismiss = {},
+            onOpenHistory = {},
+            onOpenAllowlist = {},
+            onOpenNotificationSettings = {},
+        )
+    }
+}
+
+@Preview(showSystemUi = true)
+@Composable
+private fun HomeScreenMissingPermissionsPreview() {
+    HushTheme {
+        HomeScreen(
+            uiState = HomeUiState(
+                isLoading = false,
+                blockingEnabled = true,
+                blockedPerDay = listOf(2, 5, 1, 4, 6, 9, 3),
+                permissions = PermissionsUiState(callScreeningRoleHeld = true, contactsGranted = false),
+                showPermissionsDialog = true,
+            ),
+            onBlockingChange = {},
+            onRequestPermissions = {},
+            onPermissionsDialogDismiss = {},
             onOpenHistory = {},
             onOpenAllowlist = {},
             onOpenNotificationSettings = {},

@@ -18,7 +18,7 @@ import com.iancovski.hush.ui.allowlist.AllowlistScreen
 import com.iancovski.hush.ui.allowlist.AllowlistViewModel
 import com.iancovski.hush.ui.history.HistoryScreen
 import com.iancovski.hush.ui.history.HistoryViewModel
-import com.iancovski.hush.ui.home.HomeScreen
+import com.iancovski.hush.ui.home.HomeRoute
 import com.iancovski.hush.ui.home.HomeViewModel
 import com.iancovski.hush.ui.notifications.NotificationSettingsRoute
 import com.iancovski.hush.ui.notifications.NotificationSettingsViewModel
@@ -90,12 +90,21 @@ fun HushNavDisplay(
             }
             entry<Home> {
                 val viewModel: HomeViewModel = viewModel(
-                    factory = HomeViewModel.factory(container.settingsRepository, container.blockedCallRepository),
+                    factory = HomeViewModel.factory(
+                        container.settingsRepository,
+                        container.blockedCallRepository,
+                        container.permissionsChecker,
+                    ),
                 )
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-                HomeScreen(
+                HomeRoute(
                     uiState = uiState,
+                    onRefreshPermissions = viewModel::refreshPermissions,
                     onBlockingChange = viewModel::onBlockingChange,
+                    onRoleResult = viewModel::onRoleResult,
+                    onContactsResult = viewModel::onContactsResult,
+                    onPermissionsGranted = viewModel::onPermissionsGranted,
+                    onPermissionsDialogDismiss = viewModel::onPermissionsDialogDismiss,
                     onOpenHistory = { backStack.add(History) },
                     onOpenAllowlist = { backStack.add(Allowlist) },
                     onOpenNotificationSettings = { backStack.add(NotificationSettings) },

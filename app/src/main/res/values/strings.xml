@@ -30,6 +30,9 @@
     <string name="home_protection_off_title">Protection inactive</string>
     <string name="home_protection_on_description">Blocking calls from unsaved numbers</string>
     <string name="home_protection_off_description">Allowing calls from unsaved numbers</string>
+    <string name="home_protection_missing_permissions">Required permissions are turned off</string>
+    <string name="home_permissions_dialog_title">Permissions needed</string>
+    <string name="home_permissions_dialog_text">To turn protection on, Hush needs the following permissions:</string>
     <string name="home_blocked_calls_title">Blocked calls</string>
     <string name="home_blocked_calls_period">Last 7 days</string>
 

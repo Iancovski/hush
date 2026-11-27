@@ -22,6 +22,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.iancovski.hush.R
+import com.iancovski.hush.ui.permissions.PermissionsUiState
 import com.iancovski.hush.ui.theme.HushTheme
 
 /** Second wizard step: explains and asks for the call screening role and contacts access. */

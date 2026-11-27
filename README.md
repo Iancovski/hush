@@ -34,7 +34,7 @@ A switch that turns blocking on or off. It is **on** by default.
 - **On**: incoming calls from numbers that are not in the contacts or in the allowlist are rejected before the phone rings, and so are calls from hidden or private numbers, which can never match a contact. They do not show the system missed-call notification. Android still lists them in the system call log, marked as blocked: it does that for every call rejected by a screening app, and apps cannot turn it off. Each blocked call is saved in Hush's history.
 - **Off**: Hush allows every call. Nothing is blocked and nothing is saved in the history.
 
-The switch only works while Hush has the permissions it needs (contacts access and the call screening role). If a permission is missing, the app shows it and asks the user to grant it again.
+The switch only works while Hush has the permissions it needs (contacts access and the call screening role). The setup wizard only runs the first time; if the user later removes one of these permissions, the home screen shows protection as inactive. Turning the switch on then explains which permissions are missing and asks for them again, and protection turns on once they are granted.
 
 ### History
 

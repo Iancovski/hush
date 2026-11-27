@@ -1,4 +1,4 @@
-package com.iancovski.hush.ui.setup
+package com.iancovski.hush.ui.permissions
 
 /** What the grant button does next. */
 enum class GrantAction {

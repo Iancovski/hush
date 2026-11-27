@@ -1,4 +1,4 @@
-package com.iancovski.hush.ui.setup
+package com.iancovski.hush.ui.permissions
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse

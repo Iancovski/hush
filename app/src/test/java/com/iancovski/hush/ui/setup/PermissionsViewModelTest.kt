@@ -1,8 +1,9 @@
 package com.iancovski.hush.ui.setup
 
 import com.iancovski.hush.permissions.PermissionStatus
-import com.iancovski.hush.permissions.PermissionsChecker
+import com.iancovski.hush.testing.FakePermissionsChecker
 import com.iancovski.hush.testing.MainDispatcherRule
+import com.iancovski.hush.ui.permissions.GrantAction
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
@@ -19,12 +20,6 @@ class PermissionsViewModelTest {
 
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
-
-    private class FakePermissionsChecker(
-        var status: PermissionStatus = PermissionStatus(callScreeningRoleHeld = false, contactsGranted = false),
-    ) : PermissionsChecker {
-        override fun check() = status
-    }
 
     private val checker = FakePermissionsChecker()
 

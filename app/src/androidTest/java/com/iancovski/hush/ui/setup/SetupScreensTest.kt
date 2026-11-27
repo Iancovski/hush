@@ -11,6 +11,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.iancovski.hush.R
 import com.iancovski.hush.data.NotificationMode
+import com.iancovski.hush.ui.permissions.PermissionsUiState
 import com.iancovski.hush.ui.theme.HushTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

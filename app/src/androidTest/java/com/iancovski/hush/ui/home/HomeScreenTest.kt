@@ -10,6 +10,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.iancovski.hush.R
+import com.iancovski.hush.ui.permissions.PermissionsUiState
 import com.iancovski.hush.ui.theme.HushTheme
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -35,6 +36,8 @@ class HomeScreenTest {
                 HomeScreen(
                     uiState = HomeUiState(isLoading = false, blockingEnabled = true),
                     onBlockingChange = { changedTo = it },
+                    onRequestPermissions = {},
+                    onPermissionsDialogDismiss = {},
                     onOpenHistory = {},
                     onOpenAllowlist = {},
                     onOpenNotificationSettings = {},
@@ -59,6 +62,8 @@ class HomeScreenTest {
                 HomeScreen(
                     uiState = HomeUiState(isLoading = false, blockingEnabled = false),
                     onBlockingChange = { changedTo = it },
+                    onRequestPermissions = {},
+                    onPermissionsDialogDismiss = {},
                     onOpenHistory = {},
                     onOpenAllowlist = {},
                     onOpenNotificationSettings = {},
@@ -83,6 +88,8 @@ class HomeScreenTest {
                 HomeScreen(
                     uiState = HomeUiState(isLoading = false, blockingEnabled = true),
                     onBlockingChange = {},
+                    onRequestPermissions = {},
+                    onPermissionsDialogDismiss = {},
                     onOpenHistory = { opened = true },
                     onOpenAllowlist = {},
                     onOpenNotificationSettings = {},
@@ -103,6 +110,8 @@ class HomeScreenTest {
                 HomeScreen(
                     uiState = HomeUiState(isLoading = false, blockingEnabled = true),
                     onBlockingChange = {},
+                    onRequestPermissions = {},
+                    onPermissionsDialogDismiss = {},
                     onOpenHistory = {},
                     onOpenAllowlist = { opened = true },
                     onOpenNotificationSettings = {},
@@ -123,6 +132,8 @@ class HomeScreenTest {
                 HomeScreen(
                     uiState = HomeUiState(isLoading = false, blockingEnabled = true),
                     onBlockingChange = {},
+                    onRequestPermissions = {},
+                    onPermissionsDialogDismiss = {},
                     onOpenHistory = {},
                     onOpenAllowlist = {},
                     onOpenNotificationSettings = { opened = true },
@@ -143,6 +154,8 @@ class HomeScreenTest {
                 HomeScreen(
                     uiState = HomeUiState(isLoading = false, blockingEnabled = true, blockedPerDay = listOf(2, 5, 1, 4, 0, 9, 3)),
                     onBlockingChange = {},
+                    onRequestPermissions = {},
+                    onPermissionsDialogDismiss = {},
                     onOpenHistory = { opened = true },
                     onOpenAllowlist = {},
                     onOpenNotificationSettings = {},
@@ -154,5 +167,61 @@ class HomeScreenTest {
         composeRule.onNodeWithText(string(R.string.home_blocked_calls_title), substring = true).performClick()
 
         assertTrue(opened)
+    }
+
+    @Test
+    fun aMissingPermissionShowsProtectionInactive() {
+        composeRule.setContent {
+            HushTheme {
+                HomeScreen(
+                    uiState = HomeUiState(
+                        isLoading = false,
+                        blockingEnabled = true,
+                        blockedPerDay = List(7) { 0 },
+                        permissions = PermissionsUiState(callScreeningRoleHeld = true, contactsGranted = false),
+                    ),
+                    onBlockingChange = {},
+                    onRequestPermissions = {},
+                    onPermissionsDialogDismiss = {},
+                    onOpenHistory = {},
+                    onOpenAllowlist = {},
+                    onOpenNotificationSettings = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithText(string(R.string.home_protection_missing_permissions), substring = true).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.home_protection_off_title), substring = true).assertIsOff()
+    }
+
+    @Test
+    fun theDialogListsTheMissingPermissionsAndAsksForThem() {
+        var requests = 0
+        composeRule.setContent {
+            HushTheme {
+                HomeScreen(
+                    uiState = HomeUiState(
+                        isLoading = false,
+                        blockingEnabled = false,
+                        blockedPerDay = List(7) { 0 },
+                        permissions = PermissionsUiState(callScreeningRoleHeld = false, contactsGranted = true),
+                        showPermissionsDialog = true,
+                    ),
+                    onBlockingChange = {},
+                    onRequestPermissions = { requests++ },
+                    onPermissionsDialogDismiss = {},
+                    onOpenHistory = {},
+                    onOpenAllowlist = {},
+                    onOpenNotificationSettings = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithText(string(R.string.home_permissions_dialog_title)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.permission_call_screening_title), substring = true).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.permission_contacts_title), substring = true).assertDoesNotExist()
+        composeRule.onNodeWithText(string(R.string.setup_permissions_grant)).performClick()
+
+        assertEquals(1, requests)
     }
 }
