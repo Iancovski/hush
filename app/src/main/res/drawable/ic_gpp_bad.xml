@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Material Symbols "gpp_bad", outlined, weight 300, 24px (google/material-design-icons, Apache 2.0). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="960"
+    android:viewportHeight="960">
+    <!-- The official SVG uses viewBox="0 -960 960 960", so the path is kept as is and moved down. -->
+    <group android:translateY="960">
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="m396-355.39 84-84 84 84 42.15-42.15-84-84 84-84L564-607.69l-84 84-84-84-42.15 42.15 84 84-84 84L396-355.39Zm84 254.62q-129.77-35.39-214.88-152.77Q180-370.92 180-516v-230.15l300-112.31 300 112.31V-516q0 145.08-85.12 262.46Q609.77-136.16 480-100.77Zm0-63.23q104-33 172-132t68-220v-189l-240-89.62L240-705v189q0 121 68 220t172 132Zm0-315.62Z" />
+    </group>
+</vector>

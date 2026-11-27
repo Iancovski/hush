@@ -15,6 +15,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.iancovski.hush.AppContainer
 import com.iancovski.hush.ui.home.HomeScreen
+import com.iancovski.hush.ui.home.HomeViewModel
 import com.iancovski.hush.ui.setup.NotificationsSetupRoute
 import com.iancovski.hush.ui.setup.NotificationsSetupViewModel
 import com.iancovski.hush.ui.setup.PermissionsRoute
@@ -72,7 +73,14 @@ fun HushNavDisplay(
                 )
             }
             entry<Home> {
-                HomeScreen()
+                val viewModel: HomeViewModel = viewModel(
+                    factory = HomeViewModel.factory(container.settingsRepository),
+                )
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                HomeScreen(
+                    uiState = uiState,
+                    onBlockingChange = viewModel::onBlockingChange,
+                )
             }
         },
     )

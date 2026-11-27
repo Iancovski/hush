@@ -19,6 +19,12 @@
     <string name="setup_notifications_description">Sabemos que você quer tranquilidade, então só vamos enviar as notificações que você escolher.</string>
     <string name="setup_finish">Finalizar</string>
 
+    <!-- Home -->
+    <string name="home_protection_on_title">Proteção ativa</string>
+    <string name="home_protection_off_title">Proteção inativa</string>
+    <string name="home_protection_on_description">Bloqueando chamadas de números não salvos</string>
+    <string name="home_protection_off_description">Permitindo chamadas de números não salvos</string>
+
     <!-- Permissions -->
     <string name="permission_call_screening_title">App identificador de chamada e spam</string>
     <string name="permission_call_screening_reason">Verifica cada chamada recebida antes de o telefone tocar.</string>

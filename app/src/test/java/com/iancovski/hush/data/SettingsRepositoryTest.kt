@@ -43,6 +43,15 @@ class SettingsRepositoryTest {
     }
 
     @Test
+    fun `turning blocking off is stored`() = runTest {
+        val repository = SettingsRepository(testDataStore(folder))
+
+        repository.setBlockingEnabled(false)
+
+        assertFalse(repository.settings.first().blockingEnabled)
+    }
+
+    @Test
     fun `picking the daily summary stores now as the last summary time`() = runTest {
         val dataStore = testDataStore(folder)
         val repository = SettingsRepository(dataStore, currentTimeMillis = { 1_234L })

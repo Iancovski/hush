@@ -21,6 +21,12 @@
     <string name="setup_notifications_description">We know you want peace of mind, so Hush only sends the notifications you choose.</string>
     <string name="setup_finish">Finish</string>
 
+    <!-- Home -->
+    <string name="home_protection_on_title">Protection active</string>
+    <string name="home_protection_off_title">Protection inactive</string>
+    <string name="home_protection_on_description">Blocking calls from unsaved numbers</string>
+    <string name="home_protection_off_description">Allowing calls from unsaved numbers</string>
+
     <!-- Permissions -->
     <string name="permission_call_screening_title">Caller ID &amp; spam app</string>
     <string name="permission_call_screening_reason">Checks each incoming call before the phone rings.</string>

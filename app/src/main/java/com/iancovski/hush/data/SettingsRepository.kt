@@ -34,6 +34,10 @@ class SettingsRepository(
         }
     }
 
+    suspend fun setBlockingEnabled(enabled: Boolean) {
+        dataStore.edit { preferences -> preferences[Keys.BLOCKING_ENABLED] = enabled }
+    }
+
     private fun MutablePreferences.setNotificationMode(mode: NotificationMode) {
         this[Keys.NOTIFICATION_MODE] = mode.name
         // The first daily summary only counts calls blocked after the user picked the mode.
