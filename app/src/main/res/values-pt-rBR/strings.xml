@@ -1,3 +1,37 @@
 <resources>
-    <string name="app_tagline">Bloqueia em silêncio as chamadas de números que não estão nos seus contatos.</string>
+    <!-- Setup wizard -->
+    <string name="setup_continue">Continuar</string>
+    <string name="setup_step_indicator">Passo %1$d de %2$d</string>
+
+    <string name="setup_welcome_slogan">Apenas as chamadas que importam.</string>
+    <string name="setup_welcome_description">Bloqueie automaticamente chamadas de números que não estão nos seus contatos e tenha mais tranquilidade no seu dia a dia.</string>
+    <string name="setup_welcome_start">Começar</string>
+
+    <string name="setup_permissions_title">Permissões</string>
+    <string name="setup_permissions_description">Para que o Hush consiga identificar as chamadas e bloqueá-las automaticamente, ele precisa de duas permissões:</string>
+    <string name="setup_permissions_hint">Toque no botão abaixo para conceder essas permissões ao app.</string>
+    <string name="setup_permissions_settings_hint">O Android não está mais mostrando a solicitação. Toque no botão abaixo e ative a permissão que falta nas configurações do sistema.</string>
+    <string name="setup_permissions_all_granted">Tudo certo! O Hush já tem tudo de que precisa.</string>
+    <string name="setup_permissions_grant">Conceder</string>
+    <string name="setup_permissions_open_settings">Abrir configurações</string>
+
+    <string name="setup_notifications_title">Notificações</string>
+    <string name="setup_notifications_description">Sabemos que você quer tranquilidade, então só vamos enviar as notificações que você escolher.</string>
+    <string name="setup_finish">Finalizar</string>
+
+    <!-- Permissions -->
+    <string name="permission_call_screening_title">App identificador de chamada e spam</string>
+    <string name="permission_call_screening_reason">Verifica cada chamada recebida antes de o telefone tocar.</string>
+    <string name="permission_contacts_title">Contatos</string>
+    <string name="permission_contacts_reason">Verifica se o número está salvo nos seus contatos. Eles nunca são alterados nem copiados.</string>
+    <string name="permission_status_granted">Concedida</string>
+    <string name="permission_status_missing">Não concedida</string>
+
+    <!-- Notification modes -->
+    <string name="notification_mode_every_call">A cada chamada bloqueada</string>
+    <string name="notification_mode_every_call_description">Uma notificação para cada chamada bloqueada, com o número e o horário.</string>
+    <string name="notification_mode_daily_summary">Resumo diário</string>
+    <string name="notification_mode_daily_summary_description">Uma notificação por volta das 20h com o número de chamadas bloqueadas desde o último resumo.</string>
+    <string name="notification_mode_never">Nunca</string>
+    <string name="notification_mode_never_description">Nenhuma notificação. As chamadas bloqueadas aparecem só no app.</string>
 </resources>

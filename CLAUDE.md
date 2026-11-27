@@ -29,6 +29,7 @@ app/src/main/java/com/iancovski/hush/
 ├── MainActivity.kt      # single activity, hosts Compose
 ├── AppContainer.kt      # manual DI: database, repositories, settings, app scope
 ├── screening/           # CallScreeningService and blocking decision logic
+├── permissions/         # runtime check of the call screening role and contacts access
 ├── notifications/       # blocked call notifications and the daily summary
 ├── data/                # Room entities, DAOs, database, repositories, DataStore
 └── ui/
@@ -160,7 +161,7 @@ Gradle runs on the JDK bundled with Android Studio (`JAVA_HOME` points to `Andro
 
 ### Permissions and privacy
 
-- Required: `READ_CONTACTS` and the `ROLE_CALL_SCREENING` role. Check both at runtime every time (users can revoke them) and request them with Activity Result APIs. They are first requested in the setup wizard, which does not move on until both are granted. When Android no longer shows the permission dialog, open the app's system settings instead.
+- Required: `READ_CONTACTS` and the `ROLE_CALL_SCREENING` role. Check both at runtime every time (users can revoke them) and request them with Activity Result APIs. They are first requested in the setup wizard, which does not move on until both are granted. When Android no longer shows a dialog, open the matching system settings screen instead: default apps (`ACTION_MANAGE_DEFAULT_APPS_SETTINGS`) for the role, app info for contacts.
 - Optional: `POST_NOTIFICATIONS` (Android 13+). Request it only when the user picks a notification mode other than `NEVER`. If it is not granted, behave as `NEVER` without changing the stored setting.
 - **Never** add `READ_CALL_LOG`, `READ_PHONE_STATE`, `ANSWER_PHONE_CALLS`, or `CALL_PHONE`. Hush keeps its own history. `READ_CALL_LOG` is a restricted Play Store permission.
 - No network access: the manifest has no `INTERNET` permission and no data leaves the device.
@@ -184,6 +185,6 @@ Gradle runs on the JDK bundled with Android Studio (`JAVA_HOME` points to `Andro
 - Use `runTest` from `kotlinx-coroutines-test` and inject a `StandardTestDispatcher`. ViewModel tests replace `Dispatchers.Main` with a `MainDispatcherRule`.
 - Prefer fakes (in-memory implementations) over mocks. Do not add a mocking library.
 - **Instrumented tests** (`src/androidTest`) cover DAOs with `Room.inMemoryDatabaseBuilder` and Compose screens with `createComposeRule`. Find nodes by semantics or text from resources, not by hardcoded strings.
-- Name tests with backticks describing behavior (`` `unknown number is blocked when rule is on` ``) and structure them as given, when, then.
+- Name JVM tests with backticks describing behavior (`` `unknown number is blocked when rule is on` ``) and structure them as given, when, then. Instrumented tests use camelCase names (`unknownNumberIsBlocked`), because D8 rejects spaces in method names below API 30 and `minSdk` is 29.
 - Before finishing a task, run `testDebugUnitTest` and `lint`, and make sure `assembleDebug` succeeds.
 - **Manual call screening test**: on an emulator, grant the call screening role in the app, then simulate a call via Extended controls > Phone > "Call device" or `adb emu gsm call <number>`. Test with a number in the contacts and one that is not.

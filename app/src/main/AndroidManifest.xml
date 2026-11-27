@@ -4,7 +4,11 @@
     <!-- Needed to tell saved contacts apart from unknown numbers. -->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
+    <!-- Android 13+: only requested when the user turns notifications on. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
+        android:name=".HushApplication"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"

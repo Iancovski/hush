@@ -21,8 +21,8 @@ This app does not replace the default phone app. It requires only the essential 
 The first time the user opens Hush, a setup wizard guides them through these steps:
 
 1. **Welcome**: a short description of what Hush does and a **Get started** button.
-2. **Permissions**: explains why Hush needs the call screening role and contacts access. An **Allow** button opens the Android permission dialogs. The wizard only moves on once both required permissions are granted. If the user denies one, they can tap **Allow** again. If Android stops showing the dialog, the button opens the app's system settings instead.
-3. **Notifications**: the user picks one of the notification options (see [Notifications](#notifications)), with **Every blocked call** already selected. If they pick an option other than **Never**, Hush asks for the Android notification permission. Denying it does not block the setup. Hush just works as if **Never** was selected.
+2. **Permissions**: explains why Hush needs the call screening role and contacts access. An **Allow** button opens the Android permission dialogs. The wizard only moves on once both required permissions are granted. If the user denies one, they can tap **Allow** again. If Android stops showing a dialog, the button opens the matching system settings screen instead (default apps for the call screening role, app info for contacts).
+3. **Notifications**: the user picks one of the notification options (see [Notifications](#notifications)), with **Every blocked call** already selected. If they pick an option other than **Never**, Hush asks for the Android notification permission when they tap **Finish**. Denying it does not block the setup. Hush just works as if **Never** was selected.
 4. **Done**: the app opens on the home screen, with call blocking turned on.
 
 ## Features
