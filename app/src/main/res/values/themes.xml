@@ -1,4 +1,7 @@
 <resources>
-    <!-- Window theme only. All in-app styling comes from Compose (ui/theme/Theme.kt). -->
-    <style name="Theme.Hush" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- Window theme only. All in-app styling comes from Compose (ui/theme/Theme.kt).
+         Hush is always dark; the window background also colors the Android 12+ splash screen. -->
+    <style name="Theme.Hush" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/window_background</item>
+    </style>
 </resources>

@@ -1,3 +1,5 @@
 <resources>
-    <color name="ic_launcher_background">#4A5C92</color>
+    <!-- Window and launcher colors only. In-app colors live in ui/theme/Color.kt. -->
+    <color name="window_background">#1C1B24</color>
+    <color name="ic_launcher_background">#7B5CFF</color>
 </resources>

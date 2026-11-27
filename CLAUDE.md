@@ -9,7 +9,7 @@ Hush is an open-source app for Android that blocks incoming phone calls from num
 | Area | Choice |
 | --- | --- |
 | Language | Kotlin 2.4, compiled by AGP 9 built-in Kotlin |
-| UI | Jetpack Compose (BOM), Material 3, dynamic color on Android 12+ |
+| UI | Jetpack Compose (BOM), Material 3, fixed dark brand theme, Inter typography |
 | Navigation | Navigation 3 (`androidx.navigation3`), routes are `@Serializable` `NavKey`s |
 | Persistence | Room 2.8 with KSP (blocked call history, allowlist) |
 | Preferences | DataStore Preferences (settings) |
@@ -32,12 +32,13 @@ app/src/main/java/com/iancovski/hush/
 ├── notifications/       # blocked call notifications and the daily summary
 ├── data/                # Room entities, DAOs, database, repositories, DataStore
 └── ui/
-    ├── theme/           # Material 3 theme
+    ├── theme/           # Material 3 theme: Color.kt, Type.kt, Theme.kt
     ├── navigation/      # NavKeys and NavDisplay setup
     └── setup/ home/ history/ allowlist/ settings/   # one package per screen
 app/src/test/            # JVM unit tests
 app/src/androidTest/     # instrumented tests
 app/schemas/             # exported Room schemas (committed)
+third_party/             # licenses of bundled assets (Inter font)
 ```
 
 Each screen package holds its `XScreen.kt` (stateless composables and previews), `XViewModel.kt`, and `XUiState.kt`. `setup/` holds the first-run wizard. `home/` shows the blocking switch, the permission warnings, and the 7-day blocked call counter.
@@ -93,10 +94,26 @@ Gradle runs on the JDK bundled with Android Studio (`JAVA_HOME` points to `Andro
 - Composables are free of side effects. Use `LaunchedEffect`/`DisposableEffect` with correct keys when needed.
 - Performance: UI state uses immutable types; give `LazyColumn` items a stable `key`; wrap expensive calculations in `remember`; use `derivedStateOf` for values derived from fast-changing state; defer fast-changing reads with lambda modifiers (`Modifier.offset { }`, `drawBehind { }`).
 - Use `MaterialTheme.colorScheme` and `MaterialTheme.typography`. Never hardcode colors or text sizes.
-- Edge-to-edge is mandatory on `targetSdk` 35+. Call `enableEdgeToEdge()` and apply `Scaffold` inner padding and window insets.
+- Edge-to-edge is mandatory on `targetSdk` 35+. Call `enableEdgeToEdge()` with `SystemBarStyle.dark` (light bar icons, since the app is always dark) and apply `Scaffold` inner padding and window insets.
 - Accessibility: meaningful icons get a `contentDescription` from string resources (decorative ones get `null`), touch targets are at least 48dp, and information is never conveyed by color alone.
-- Provide `@Preview`s for every screen, covering light and dark themes and the main states (empty, loaded).
+- Provide `@Preview`s for every screen, wrapped in `HushTheme`, covering the main states (empty, loaded).
 - Icons are Material Symbols added as vector drawables in `res/drawable`. Do not add `material-icons-extended`.
+
+### Design
+
+- Hush is always dark. There is no light theme and no dynamic color: `HushTheme` takes no theme parameters and always applies the brand palette.
+- Brand palette, mapped to the Material 3 color scheme in `ui/theme/Color.kt`:
+
+  | Color | Hex | Use | Color scheme role |
+  | --- | --- | --- | --- |
+  | Main purple | `#7B5CFF` | Buttons and highlights | `primary` |
+  | Lilac | `#A886FF` | Gradients | `secondary`, `tertiary` |
+  | Dark background | `#1C1B24` | Background | `background`, `surface` |
+  | Soft white | `#F5F5FA` | Text | `onBackground`, `onSurface` |
+
+- Gradients use `MaterialTheme.colorScheme.brandGradient` (purple to lilac). Do not build gradients from raw colors.
+- Text on `primary` uses `onPrimary` (pure white, the best contrast available on the main purple). For text links or colored text on the background, prefer `secondary` (lilac): `primary` on the dark background stays below the 4.5:1 text contrast ratio.
+- Typography is Inter, bundled as a variable font in `res/font/inter_variable.ttf` (license in `third_party/inter/`) and applied to the whole Material 3 type scale in `ui/theme/Type.kt`. Never use downloadable fonts.
 
 ### Navigation 3
 
