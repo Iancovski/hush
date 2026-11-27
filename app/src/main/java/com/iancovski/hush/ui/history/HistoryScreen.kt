@@ -1,7 +1,9 @@
 package com.iancovski.hush.ui.history
 
 import android.text.format.DateFormat
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -26,14 +29,21 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -41,13 +51,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.iancovski.hush.R
+import com.iancovski.hush.ui.allowlist.AllowedNumberDialog
 import com.iancovski.hush.ui.theme.HushTheme
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -60,12 +73,34 @@ fun HistoryScreen(
     uiState: HistoryUiState,
     onBackClick: () -> Unit,
     onClearHistory: () -> Unit,
+    onCallNumberClick: (HistoryItem) -> Unit,
+    onAddToAllowlistClick: (HistoryItem) -> Unit,
+    onAddToContactsClick: (HistoryItem) -> Unit,
+    onAllowlistDialogInputChange: () -> Unit,
+    onAllowlistDialogConfirm: (number: String, name: String) -> Unit,
+    onAllowlistDialogDismiss: () -> Unit,
+    onAddedToAllowlistShown: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var showClearDialog by rememberSaveable { mutableStateOf(false) }
+    // Which call's actions sheet is open. Only the id is saved, so the sheet survives rotation.
+    var selectedCallId by rememberSaveable { mutableStateOf<Long?>(null) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val snackbarScope = rememberCoroutineScope()
+    val addedMessage = stringResource(R.string.history_added_to_allowlist)
+
+    LaunchedEffect(uiState.showAddedToAllowlist) {
+        if (uiState.showAddedToAllowlist) {
+            // Shown from its own scope: marking it as shown changes this effect's key, which would
+            // cancel a snackbar launched here.
+            snackbarScope.launch { snackbarHostState.showSnackbar(addedMessage) }
+            onAddedToAllowlistShown()
+        }
+    }
 
     Scaffold(
         modifier = modifier,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.history_title)) },
@@ -89,7 +124,11 @@ fun HistoryScreen(
         when {
             uiState.isLoading -> Unit
             uiState.calls.isEmpty() -> EmptyHistory(Modifier.padding(innerPadding))
-            else -> BlockedCallList(calls = uiState.calls, contentPadding = innerPadding)
+            else -> BlockedCallList(
+                calls = uiState.calls,
+                onCallClick = { call -> selectedCallId = call.id },
+                contentPadding = innerPadding,
+            )
         }
     }
 
@@ -100,6 +139,23 @@ fun HistoryScreen(
                 onClearHistory()
             },
             onDismiss = { showClearDialog = false },
+        )
+    }
+    uiState.allowlistDialog?.let { dialog ->
+        AllowedNumberDialog(
+            state = dialog,
+            onInputChange = onAllowlistDialogInputChange,
+            onConfirm = onAllowlistDialogConfirm,
+            onDismiss = onAllowlistDialogDismiss,
+        )
+    }
+    uiState.calls.firstOrNull { it.id == selectedCallId }?.let { call ->
+        CallActionsSheet(
+            call = call,
+            onCallNumberClick = { onCallNumberClick(call) },
+            onAddToAllowlistClick = { onAddToAllowlistClick(call) },
+            onAddToContactsClick = { onAddToContactsClick(call) },
+            onDismiss = { selectedCallId = null },
         )
     }
 }
@@ -156,6 +212,7 @@ private fun ClearHistoryDialog(
 @Composable
 private fun BlockedCallList(
     calls: List<HistoryItem>,
+    onCallClick: (HistoryItem) -> Unit,
     contentPadding: PaddingValues,
     modifier: Modifier = Modifier,
 ) {
@@ -169,7 +226,7 @@ private fun BlockedCallList(
                 DayHeader(date = day.date, today = today)
             }
             itemsIndexed(day.calls, key = { _, call -> call.id }) { index, call ->
-                BlockedCallItem(call = call, zone = zone)
+                BlockedCallItem(call = call, zone = zone, onClick = { onCallClick(call) })
                 if (index < day.calls.lastIndex) {
                     HorizontalDivider(
                         modifier = Modifier.padding(horizontal = 24.dp),
@@ -212,11 +269,19 @@ private fun DayHeader(
 private fun BlockedCallItem(
     call: HistoryItem,
     zone: ZoneId,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val number = call.number
+    val caller = number ?: stringResource(R.string.history_private_number)
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .clickable(
+                onClickLabel = stringResource(R.string.history_call_options, caller),
+                role = Role.Button,
+                onClick = onClick,
+            )
             .semantics(mergeDescendants = true) {}
             .padding(horizontal = 24.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -237,7 +302,7 @@ private fun BlockedCallItem(
         }
         Spacer(Modifier.width(16.dp))
         Text(
-            text = call.number ?: stringResource(R.string.history_private_number),
+            text = caller,
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.weight(1f),
@@ -248,6 +313,113 @@ private fun BlockedCallItem(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+    }
+}
+
+/** Opens from the bottom when a call is tapped, with what the user can do with its number. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CallActionsSheet(
+    call: HistoryItem,
+    onCallNumberClick: () -> Unit,
+    onAddToAllowlistClick: () -> Unit,
+    onAddToContactsClick: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    // Only hidden or fully open: the sheet is short, so a half-open state would add nothing.
+    // A hidden number cannot be called back or saved, so its actions show as unavailable.
+    val hasNumber = call.number != null
+    val sheetState = rememberBottomSheetState(SheetValue.Hidden, setOf(SheetValue.Hidden, SheetValue.Expanded))
+    val scope = rememberCoroutineScope()
+    // Slides the sheet away first, then runs the action, so the next screen opens on a closed sheet.
+    val closeThen: (() -> Unit) -> Unit = { action ->
+        scope.launch { sheetState.hide() }.invokeOnCompletion {
+            onDismiss()
+            action()
+        }
+    }
+    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState, modifier = modifier) {
+        Column(modifier = Modifier.padding(bottom = 16.dp)) {
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 8.dp),
+            ) {
+                Text(
+                    text = call.number ?: stringResource(R.string.history_private_number),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    text = rememberFormattedDateTime(call.receivedAt),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            SheetAction(
+                iconRes = R.drawable.ic_call,
+                label = stringResource(R.string.history_call_number),
+                enabled = hasNumber,
+                onClick = { closeThen(onCallNumberClick) },
+            )
+            SheetAction(
+                iconRes = R.drawable.ic_person,
+                label = stringResource(R.string.history_add_to_allowlist),
+                enabled = hasNumber,
+                onClick = { closeThen(onAddToAllowlistClick) },
+            )
+            SheetAction(
+                iconRes = R.drawable.ic_person_add,
+                label = stringResource(R.string.history_add_to_contacts),
+                enabled = hasNumber,
+                onClick = { closeThen(onAddToContactsClick) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun SheetAction(
+    @DrawableRes iconRes: Int,
+    label: String,
+    enabled: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    // Material's disabled look: the same colors at 38% opacity.
+    val alpha = if (enabled) 1f else 0.38f
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = 56.dp)
+            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
+            .padding(horizontal = 24.dp, vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        // Decorative: the label says what the action does.
+        Icon(
+            painter = painterResource(iconRes),
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha),
+        )
+        Spacer(Modifier.width(16.dp))
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
+        )
+    }
+}
+
+/** Day, month and time in the user's language and 12/24-hour preference, such as "27 de nov., 18:11". */
+@Composable
+private fun rememberFormattedDateTime(epochMillis: Long): String {
+    val locale = LocalConfiguration.current.locales[0]
+    return remember(epochMillis, locale) {
+        DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, "dMMMjm"), locale)
+            .format(Instant.ofEpochMilli(epochMillis).atZone(ZoneId.systemDefault()))
     }
 }
 
@@ -308,6 +480,13 @@ private fun HistoryScreenLoadedPreview() {
             ),
             onBackClick = {},
             onClearHistory = {},
+            onCallNumberClick = {},
+            onAddToAllowlistClick = {},
+            onAddToContactsClick = {},
+            onAllowlistDialogInputChange = {},
+            onAllowlistDialogConfirm = { _, _ -> },
+            onAllowlistDialogDismiss = {},
+            onAddedToAllowlistShown = {},
         )
     }
 }
@@ -320,6 +499,13 @@ private fun HistoryScreenEmptyPreview() {
             uiState = HistoryUiState(isLoading = false),
             onBackClick = {},
             onClearHistory = {},
+            onCallNumberClick = {},
+            onAddToAllowlistClick = {},
+            onAddToContactsClick = {},
+            onAllowlistDialogInputChange = {},
+            onAllowlistDialogConfirm = { _, _ -> },
+            onAllowlistDialogDismiss = {},
+            onAddedToAllowlistShown = {},
         )
     }
 }

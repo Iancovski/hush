@@ -18,6 +18,8 @@ data class AllowlistItem(
 data class NumberDialogState(
     /** The entry being edited, or null when adding a new number. */
     val editing: AllowlistItem? = null,
+    /** Number to start with when adding, for example one picked from the history. */
+    val prefilledNumber: String? = null,
     val error: NumberError? = null,
     val isSaving: Boolean = false,
 )

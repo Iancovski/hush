@@ -44,6 +44,11 @@
     <string name="history_yesterday">Yesterday</string>
     <string name="history_private_number">Private number</string>
     <string name="history_more_options">More options</string>
+    <string name="history_call_options">Options for %1$s</string>
+    <string name="history_call_number">Call</string>
+    <string name="history_add_to_allowlist">Add to allowed numbers</string>
+    <string name="history_add_to_contacts">Add to contacts</string>
+    <string name="history_added_to_allowlist">Number added to the allowed numbers</string>
     <string name="history_clear">Clear history</string>
     <string name="history_clear_dialog_title">Clear history?</string>
     <string name="history_clear_dialog_text">All blocked calls will be removed from Hush. This cannot be undone.</string>

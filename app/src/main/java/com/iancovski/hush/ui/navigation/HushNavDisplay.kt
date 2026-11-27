@@ -16,7 +16,7 @@ import androidx.navigation3.ui.NavDisplay
 import com.iancovski.hush.AppContainer
 import com.iancovski.hush.ui.allowlist.AllowlistScreen
 import com.iancovski.hush.ui.allowlist.AllowlistViewModel
-import com.iancovski.hush.ui.history.HistoryScreen
+import com.iancovski.hush.ui.history.HistoryRoute
 import com.iancovski.hush.ui.history.HistoryViewModel
 import com.iancovski.hush.ui.home.HomeRoute
 import com.iancovski.hush.ui.home.HomeViewModel
@@ -112,13 +112,18 @@ fun HushNavDisplay(
             }
             entry<History> {
                 val viewModel: HistoryViewModel = viewModel(
-                    factory = HistoryViewModel.factory(container.blockedCallRepository),
+                    factory = HistoryViewModel.factory(container.blockedCallRepository, container.allowlistRepository),
                 )
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-                HistoryScreen(
+                HistoryRoute(
                     uiState = uiState,
                     onBackClick = { backStack.removeLastOrNull() },
                     onClearHistory = viewModel::onClearHistory,
+                    onAddToAllowlistClick = viewModel::onAddToAllowlistClick,
+                    onAllowlistDialogInputChange = viewModel::onAllowlistDialogInputChange,
+                    onAllowlistDialogConfirm = viewModel::onAllowlistDialogConfirm,
+                    onAllowlistDialogDismiss = viewModel::onAllowlistDialogDismiss,
+                    onAddedToAllowlistShown = viewModel::onAddedToAllowlistShown,
                 )
             }
             entry<NotificationSettings> {

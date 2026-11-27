@@ -40,7 +40,7 @@ The switch only works while Hush has the permissions it needs (contacts access a
 
 A list of every blocked call, newest first. Each entry shows the number and the date and time of the call.
 
-- Selecting an entry lets the user add that number to the allowlist.
+- Selecting an entry lets the user call the number back, add it to the allowlist, or add it to the contacts. For a hidden number these options show as unavailable. Calling opens the phone app with the number filled in, and the user starts the call there. Adding to the contacts opens the phone's contacts app with the number filled in, to create a new contact or add it to an existing one; Hush never writes to the contacts itself.
 - The user can clear the whole history.
 
 ### Statistics

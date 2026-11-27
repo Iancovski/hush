@@ -2,6 +2,7 @@ package com.iancovski.hush.ui.history
 
 import androidx.annotation.StringRes
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
@@ -35,7 +36,18 @@ class HistoryScreenTest {
     fun emptyHistoryShowsTheEmptyStateAndNoMenu() {
         composeRule.setContent {
             HushTheme {
-                HistoryScreen(uiState = HistoryUiState(isLoading = false), onBackClick = {}, onClearHistory = {})
+                HistoryScreen(
+                    uiState = HistoryUiState(isLoading = false),
+                    onBackClick = {},
+                    onClearHistory = {},
+                    onCallNumberClick = {},
+                    onAddToAllowlistClick = {},
+                    onAddToContactsClick = {},
+                    onAllowlistDialogInputChange = {},
+                    onAllowlistDialogConfirm = { _, _ -> },
+                    onAllowlistDialogDismiss = {},
+                    onAddedToAllowlistShown = {},
+                )
             }
         }
 
@@ -51,6 +63,13 @@ class HistoryScreenTest {
                     uiState = HistoryUiState(isLoading = false, calls = calls),
                     onBackClick = {},
                     onClearHistory = {},
+                    onCallNumberClick = {},
+                    onAddToAllowlistClick = {},
+                    onAddToContactsClick = {},
+                    onAllowlistDialogInputChange = {},
+                    onAllowlistDialogConfirm = { _, _ -> },
+                    onAllowlistDialogDismiss = {},
+                    onAddedToAllowlistShown = {},
                 )
             }
         }
@@ -71,6 +90,13 @@ class HistoryScreenTest {
                     ),
                     onBackClick = {},
                     onClearHistory = {},
+                    onCallNumberClick = {},
+                    onAddToAllowlistClick = {},
+                    onAddToContactsClick = {},
+                    onAllowlistDialogInputChange = {},
+                    onAllowlistDialogConfirm = { _, _ -> },
+                    onAllowlistDialogDismiss = {},
+                    onAddedToAllowlistShown = {},
                 )
             }
         }
@@ -87,6 +113,13 @@ class HistoryScreenTest {
                     uiState = HistoryUiState(isLoading = false, calls = calls),
                     onBackClick = {},
                     onClearHistory = { cleared++ },
+                    onCallNumberClick = {},
+                    onAddToAllowlistClick = {},
+                    onAddToContactsClick = {},
+                    onAllowlistDialogInputChange = {},
+                    onAllowlistDialogConfirm = { _, _ -> },
+                    onAllowlistDialogDismiss = {},
+                    onAddedToAllowlistShown = {},
                 )
             }
         }
@@ -111,6 +144,13 @@ class HistoryScreenTest {
                     uiState = HistoryUiState(isLoading = false),
                     onBackClick = { wentBack = true },
                     onClearHistory = {},
+                    onCallNumberClick = {},
+                    onAddToAllowlistClick = {},
+                    onAddToContactsClick = {},
+                    onAllowlistDialogInputChange = {},
+                    onAllowlistDialogConfirm = { _, _ -> },
+                    onAllowlistDialogDismiss = {},
+                    onAddedToAllowlistShown = {},
                 )
             }
         }
@@ -118,5 +158,81 @@ class HistoryScreenTest {
         composeRule.onNodeWithContentDescription(string(R.string.navigate_back)).performClick()
 
         assertTrue(wentBack)
+    }
+
+    private fun setHistory(
+        onCallNumberClick: (HistoryItem) -> Unit = {},
+        onAddToAllowlistClick: (HistoryItem) -> Unit = {},
+        onAddToContactsClick: (HistoryItem) -> Unit = {},
+    ) {
+        composeRule.setContent {
+            HushTheme {
+                HistoryScreen(
+                    uiState = HistoryUiState(isLoading = false, calls = calls),
+                    onBackClick = {},
+                    onClearHistory = {},
+                    onCallNumberClick = onCallNumberClick,
+                    onAddToAllowlistClick = onAddToAllowlistClick,
+                    onAddToContactsClick = onAddToContactsClick,
+                    onAllowlistDialogInputChange = {},
+                    onAllowlistDialogConfirm = { _, _ -> },
+                    onAllowlistDialogDismiss = {},
+                    onAddedToAllowlistShown = {},
+                )
+            }
+        }
+    }
+
+    @Test
+    fun tappingACallOffersToAddItToTheAllowlist() {
+        var added: HistoryItem? = null
+        setHistory(onAddToAllowlistClick = { added = it })
+
+        composeRule.onNodeWithText("+5511900001111").performClick()
+        composeRule.onNodeWithText(string(R.string.history_add_to_contacts)).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.history_add_to_allowlist)).performClick()
+        composeRule.waitForIdle()
+
+        assertEquals(calls.first(), added)
+    }
+
+    @Test
+    fun tappingACallOffersToAddItToTheContacts() {
+        var added: HistoryItem? = null
+        setHistory(onAddToContactsClick = { added = it })
+
+        composeRule.onNodeWithText("+5511900001111").performClick()
+        composeRule.onNodeWithText(string(R.string.history_add_to_contacts)).performClick()
+        composeRule.waitForIdle()
+
+        assertEquals(calls.first(), added)
+    }
+
+    @Test
+    fun aHiddenNumberShowsItsActionsDisabled() {
+        var actions = 0
+        setHistory(
+            onCallNumberClick = { actions++ },
+            onAddToAllowlistClick = { actions++ },
+            onAddToContactsClick = { actions++ },
+        )
+
+        composeRule.onNodeWithText(string(R.string.history_private_number)).performClick()
+
+        listOf(R.string.history_call_number, R.string.history_add_to_allowlist, R.string.history_add_to_contacts)
+            .forEach { action -> composeRule.onNodeWithText(string(action)).assertIsNotEnabled() }
+        assertEquals(0, actions)
+    }
+
+    @Test
+    fun tappingACallOffersToCallItBack() {
+        var called: HistoryItem? = null
+        setHistory(onCallNumberClick = { called = it })
+
+        composeRule.onNodeWithText("+5511900001111").performClick()
+        composeRule.onNodeWithText(string(R.string.history_call_number)).performClick()
+        composeRule.waitForIdle()
+
+        assertEquals(calls.first(), called)
     }
 }

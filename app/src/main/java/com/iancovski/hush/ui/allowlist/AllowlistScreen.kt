@@ -111,7 +111,7 @@ fun AllowlistScreen(
     }
 
     uiState.numberDialog?.let { dialog ->
-        NumberDialog(
+        AllowedNumberDialog(
             state = dialog,
             onInputChange = onDialogInputChange,
             onConfirm = onDialogConfirm,
@@ -271,9 +271,9 @@ private fun EmptyAllowlist(modifier: Modifier = Modifier) {
     }
 }
 
-/** Adds a number, or edits [NumberDialogState.editing] when it is set. */
+/** Adds a number to the allowlist, or edits [NumberDialogState.editing] when it is set. */
 @Composable
-private fun NumberDialog(
+fun AllowedNumberDialog(
     state: NumberDialogState,
     onInputChange: () -> Unit,
     onConfirm: (number: String, name: String) -> Unit,
@@ -282,7 +282,9 @@ private fun NumberDialog(
 ) {
     val editing = state.editing
     // What the user is typing is input state; the view model only sees it on confirm.
-    var number by rememberSaveable(editing?.id) { mutableStateOf(editing?.number.orEmpty()) }
+    var number by rememberSaveable(editing?.id, state.prefilledNumber) {
+        mutableStateOf(editing?.number ?: state.prefilledNumber.orEmpty())
+    }
     var name by rememberSaveable(editing?.id) { mutableStateOf(editing?.name.orEmpty()) }
     val canConfirm = number.isNotBlank() && !state.isSaving
     val buttonColors = dialogButtonColors()
