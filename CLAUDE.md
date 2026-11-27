@@ -149,11 +149,11 @@ Gradle runs on the JDK bundled with Android Studio (`JAVA_HOME` points to `Andro
 
 ### Call screening
 
-- Only act on `Call.Details.CALL_DIRECTION_INCOMING`. Allow everything else untouched.
-- Decision order: if blocking is off, allow. If the number is in the contacts or in the allowlist, allow. Otherwise block. An allowed call is never recorded.
-- A blocked call is rejected with `setDisallowCall(true)`, `setRejectCall(true)`, `setSkipNotification(true)`, and `setSkipCallLog(true)`. Hiding it from the system call log is not configurable.
+- Only act on `Call.Details.DIRECTION_INCOMING`. Allow everything else untouched.
+- Decision order: if blocking is off, allow. If the number is in the contacts or in the allowlist, allow. A hidden or private number (no number, or a presentation other than `TelecomManager.PRESENTATION_ALLOWED`) can never match, so it is blocked. Otherwise block. An allowed call is never recorded.
+- A blocked call is rejected with `setDisallowCall(true)`, `setRejectCall(true)`, `setSkipNotification(true)`, and `setSkipCallLog(true)`. Android ignores the last one for rejected calls and always logs them as `CallLog.Calls.BLOCKED_TYPE`, so they show in the dialer history marked as blocked. That is outside the app's control.
 - The allowlist is also kept in the in-memory snapshot, so the check never queries Room during the call.
-- `onScreenCall()` must call `respondToCall()` fast (the system enforces a short timeout). The contact lookup and decision are synchronous and cheap. Settings come from an in-memory snapshot kept up to date in the application scope, not from a DataStore read during the call.
+- `onScreenCall()` must lead to `respondToCall()` fast (the system enforces a short timeout). The service launches the screening in the application scope on the injected IO dispatcher (the contact lookup is a disk query) and calls `respondToCall()` from there, inside a `finally` that answers Allow if screening throws. Contacts are matched with `PhoneLookup.ENTERPRISE_CONTENT_FILTER_URI`. Settings come from an in-memory snapshot (`SettingsSnapshot`) kept up to date in the application scope, not from a DataStore read during the call. Most calls arrive with the process dead, so the snapshot may still be loading: it waits for the first read for at most 1 second, then the call is allowed.
 - Write the blocked call to the database in the application scope, off the main thread. It must never delay `respondToCall()`. In `EVERY_CALL` mode, post the Hush notification from there too.
 - **Fail open**: on any error or missing permission, allow the call. A missed block is better than a missed legitimate call.
 - Keep the decision logic in `screening/` as plain Kotlin without Android types, so it runs in JVM tests. The service is a thin adapter around it.

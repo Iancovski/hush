@@ -1,0 +1,67 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "691010789a13611c59b5954f50810a04",
+    "entities": [
+      {
+        "tableName": "blocked_calls",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `number` TEXT, `normalized_number` TEXT, `received_at` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "number",
+            "columnName": "number",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "normalizedNumber",
+            "columnName": "normalized_number",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "receivedAt",
+            "columnName": "received_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_blocked_calls_received_at",
+            "unique": false,
+            "columnNames": [
+              "received_at"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_blocked_calls_received_at` ON `${TABLE_NAME}` (`received_at`)"
+          },
+          {
+            "name": "index_blocked_calls_normalized_number",
+            "unique": false,
+            "columnNames": [
+              "normalized_number"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_blocked_calls_normalized_number` ON `${TABLE_NAME}` (`normalized_number`)"
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '691010789a13611c59b5954f50810a04')"
+    ]
+  }
+}
