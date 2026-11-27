@@ -4,23 +4,35 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.iancovski.hush.data.BlockedCallRepository
 import com.iancovski.hush.data.SettingsRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.io.IOException
+import java.time.ZonedDateTime
 
-class HomeViewModel(private val settingsRepository: SettingsRepository) : ViewModel() {
+class HomeViewModel(
+    private val settingsRepository: SettingsRepository,
+    blockedCallRepository: BlockedCallRepository,
+    now: () -> ZonedDateTime = ZonedDateTime::now,
+) : ViewModel() {
 
-    val uiState: StateFlow<HomeUiState> = settingsRepository.settings
-        .map { settings -> HomeUiState(isLoading = false, blockingEnabled = settings.blockingEnabled) }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = HomeUiState(),
-        )
+    // The days are computed when the screen starts observing, so coming back to Home after
+    // midnight moves the week forward.
+    private val blockedPerDay = flow { emitAll(blockedCallRepository.countsPerDay(lastSevenDayStarts(now()))) }
+
+    val uiState: StateFlow<HomeUiState> = combine(settingsRepository.settings, blockedPerDay) { settings, perDay ->
+        HomeUiState(isLoading = false, blockingEnabled = settings.blockingEnabled, blockedPerDay = perDay)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = HomeUiState(),
+    )
 
     fun onBlockingChange(enabled: Boolean) {
         viewModelScope.launch {
@@ -33,8 +45,9 @@ class HomeViewModel(private val settingsRepository: SettingsRepository) : ViewMo
     }
 
     companion object {
-        fun factory(settingsRepository: SettingsRepository) = viewModelFactory {
-            initializer { HomeViewModel(settingsRepository) }
-        }
+        fun factory(settingsRepository: SettingsRepository, blockedCallRepository: BlockedCallRepository) =
+            viewModelFactory {
+                initializer { HomeViewModel(settingsRepository, blockedCallRepository) }
+            }
     }
 }

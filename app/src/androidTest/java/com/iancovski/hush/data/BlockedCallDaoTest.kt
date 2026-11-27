@@ -61,4 +61,18 @@ class BlockedCallDaoTest {
         assertEquals(2, dao.countSince(1_000L))
         assertEquals(0, dao.countSince(3_000L))
     }
+
+    @Test
+    fun countsPerDayFollowTheGivenBoundaries() = runTest {
+        dao.insert(BlockedCall(number = "before", normalizedNumber = null, receivedAt = 999L))
+        dao.insert(BlockedCall(number = "day0", normalizedNumber = null, receivedAt = 1_000L))
+        dao.insert(BlockedCall(number = "day2a", normalizedNumber = null, receivedAt = 3_500L))
+        dao.insert(BlockedCall(number = "day2b", normalizedNumber = null, receivedAt = 3_999L))
+        dao.insert(BlockedCall(number = "day6", normalizedNumber = null, receivedAt = 7_000L))
+        dao.insert(BlockedCall(number = "after", normalizedNumber = null, receivedAt = 8_000L))
+
+        val counts = dao.observeCountsPerDay(1_000L, 2_000L, 3_000L, 4_000L, 5_000L, 6_000L, 7_000L, 8_000L).first()
+
+        assertEquals(listOf(1, 0, 2, 0, 0, 0, 1), counts.toList())
+    }
 }

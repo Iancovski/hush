@@ -28,6 +28,8 @@
     <string name="home_protection_off_title">Proteção inativa</string>
     <string name="home_protection_on_description">Bloqueando chamadas de números não salvos</string>
     <string name="home_protection_off_description">Permitindo chamadas de números não salvos</string>
+    <string name="home_blocked_calls_title">Chamadas bloqueadas</string>
+    <string name="home_blocked_calls_period">Últimos 7 dias</string>
 
     <!-- History -->
     <string name="history_title">Histórico de bloqueios</string>

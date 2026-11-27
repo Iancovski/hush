@@ -30,6 +30,8 @@
     <string name="home_protection_off_title">Protection inactive</string>
     <string name="home_protection_on_description">Blocking calls from unsaved numbers</string>
     <string name="home_protection_off_description">Allowing calls from unsaved numbers</string>
+    <string name="home_blocked_calls_title">Blocked calls</string>
+    <string name="home_blocked_calls_period">Last 7 days</string>
 
     <!-- History -->
     <string name="history_title">Blocked call history</string>

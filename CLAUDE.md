@@ -137,7 +137,7 @@ Gradle runs on the JDK bundled with Android Studio (`JAVA_HOME` points to `Andro
 
 - DAO functions return `Flow` for observed queries and are `suspend` for one-shot reads and writes. No blocking DAO functions, no `allowMainThreadQueries()`.
 - Keep `exportSchema = true` and commit `app/schemas/`. Every version bump ships a `Migration` or `AutoMigration`. Never use `fallbackToDestructiveMigration()`: the user's history must survive updates.
-- Do aggregation (such as the 7-day blocked call count and the daily summary count) in SQL, not in Kotlin over full lists.
+- Do aggregation (such as the 7-day blocked call count and the daily summary count) in SQL, not in Kotlin over full lists. The Home chart counts each of the last seven local days in one query: Kotlin computes the day boundaries with `java.time` (so daylight saving days keep their real length) and SQL sums the calls between them.
 - Index columns used in `WHERE`, `GROUP BY`, and `ORDER BY` (timestamp, normalized number).
 - Use `@Transaction` for multi-step writes. The database is a single instance created in `AppContainer`.
 

@@ -134,4 +134,25 @@ class HomeScreenTest {
 
         assertTrue(opened)
     }
+
+    @Test
+    fun blockedCallsCounterShowsTheTotalAndOpensTheHistory() {
+        var opened = false
+        composeRule.setContent {
+            HushTheme {
+                HomeScreen(
+                    uiState = HomeUiState(isLoading = false, blockingEnabled = true, blockedPerDay = listOf(2, 5, 1, 4, 0, 9, 3)),
+                    onBlockingChange = {},
+                    onOpenHistory = { opened = true },
+                    onOpenAllowlist = {},
+                    onOpenNotificationSettings = {},
+                )
+            }
+        }
+
+        composeRule.onNodeWithText("24", substring = true).assertIsDisplayed()
+        composeRule.onNodeWithText(string(R.string.home_blocked_calls_title), substring = true).performClick()
+
+        assertTrue(opened)
+    }
 }

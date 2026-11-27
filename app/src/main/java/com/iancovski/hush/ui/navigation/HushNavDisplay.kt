@@ -90,7 +90,7 @@ fun HushNavDisplay(
             }
             entry<Home> {
                 val viewModel: HomeViewModel = viewModel(
-                    factory = HomeViewModel.factory(container.settingsRepository),
+                    factory = HomeViewModel.factory(container.settingsRepository, container.blockedCallRepository),
                 )
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                 HomeScreen(
