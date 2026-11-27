@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.iancovski.hush.data.NotificationMode
-import com.iancovski.hush.data.SettingsRepository
+import com.iancovski.hush.notifications.NotificationModeController
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
 
-class NotificationsSetupViewModel(private val settingsRepository: SettingsRepository) : ViewModel() {
+class NotificationsSetupViewModel(private val notificationModeController: NotificationModeController) : ViewModel() {
 
     private val state = MutableStateFlow(NotificationsSetupUiState())
 
@@ -37,7 +37,7 @@ class NotificationsSetupViewModel(private val settingsRepository: SettingsReposi
         state.update { it.copy(isFinishing = true) }
         viewModelScope.launch {
             try {
-                settingsRepository.completeSetup(state.value.selectedMode)
+                notificationModeController.completeSetup(state.value.selectedMode)
             } catch (_: IOException) {
                 // Let the user try again instead of leaving the button disabled.
                 state.update { it.copy(isFinishing = false) }
@@ -46,8 +46,8 @@ class NotificationsSetupViewModel(private val settingsRepository: SettingsReposi
     }
 
     companion object {
-        fun factory(settingsRepository: SettingsRepository) = viewModelFactory {
-            initializer { NotificationsSetupViewModel(settingsRepository) }
+        fun factory(notificationModeController: NotificationModeController) = viewModelFactory {
+            initializer { NotificationsSetupViewModel(notificationModeController) }
         }
     }
 }

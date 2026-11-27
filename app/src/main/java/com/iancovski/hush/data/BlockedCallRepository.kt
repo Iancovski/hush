@@ -22,6 +22,9 @@ class BlockedCallRepository(
         )
     }
 
+    /** How many calls were blocked after [since] (epoch milliseconds). */
+    suspend fun countSince(since: Long): Int = dao.countSince(since)
+
     suspend fun clear() {
         dao.deleteAll()
     }

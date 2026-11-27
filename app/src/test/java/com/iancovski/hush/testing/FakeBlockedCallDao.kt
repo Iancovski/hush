@@ -19,6 +19,8 @@ class FakeBlockedCallDao : BlockedCallDao {
     override fun observeAll(): Flow<List<BlockedCall>> =
         calls.map { list -> list.sortedByDescending { it.receivedAt } }
 
+    override suspend fun countSince(since: Long): Int = calls.value.count { it.receivedAt > since }
+
     override suspend fun deleteAll() {
         calls.value = emptyList()
     }

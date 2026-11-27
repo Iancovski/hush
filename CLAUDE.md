@@ -35,7 +35,8 @@ app/src/main/java/com/iancovski/hush/
 └── ui/
     ├── theme/           # Material 3 theme: Color.kt, Type.kt, Theme.kt
     ├── navigation/      # NavKeys and NavDisplay setup
-    └── setup/ home/ history/ allowlist/ settings/   # one package per screen
+    ├── components/      # composables shared by several screens (the notification mode selector)
+    └── setup/ home/ history/ allowlist/ notifications/   # one package per screen
 app/src/test/            # JVM unit tests
 app/src/androidTest/     # instrumented tests
 app/schemas/             # exported Room schemas (committed)
@@ -160,10 +161,11 @@ Gradle runs on the JDK bundled with Android Studio (`JAVA_HOME` points to `Andro
 
 ### Notifications
 
-- Hush posts its notifications on its own channel, with text from string resources. Tapping a notification opens the history.
+- Hush posts its notifications on its own two channels (`blocked_calls` and `daily_summary`, created on every app start), with text from string resources. Notifications use `VISIBILITY_PRIVATE`, so numbers stay hidden on a locked screen. Tapping a notification opens the history: the `PendingIntent` targets `MainActivity` with an extra (`MainActivity.openHistoryIntent`), and the navigation turns it into a back stack of Home and History.
+- All posting goes through the `Notifier` interface (`AndroidNotifier` in the app, a fake in tests). It checks the notification permission before every post and silently posts nothing without it, so Hush behaves as `NEVER` without changing the stored setting. In `EVERY_CALL` mode, `BlockedCallAlerts` posts one notification per blocked call, after the call is recorded.
 - The daily summary targets 20:00 local time. It is a `CoroutineWorker` enqueued as unique one-time work (`enqueueUniqueWork`), with an initial delay computed with `java.time` up to the next 20:00. Do not use periodic work, because its run time drifts over the days.
-- When the mode changes to `DAILY_SUMMARY`, store "last summary at" as now and enqueue with `ExistingWorkPolicy.REPLACE`. When it changes to anything else, cancel the work. On app start, if the mode is `DAILY_SUMMARY`, enqueue with `ExistingWorkPolicy.KEEP` in case the work was lost.
-- The worker counts blocked calls since "last summary at" with a SQL query, so a late run never skips or double-counts calls. It posts nothing if the count is zero or the notification permission is missing. In every case it then stores "last summary at" as now and enqueues the next run for the following 20:00.
+- Mode changes go through `NotificationModeController` (from the setup wizard and the notifications screen). When the mode changes to `DAILY_SUMMARY`, store "last summary at" as now and enqueue with `ExistingWorkPolicy.REPLACE`. When it changes to anything else, cancel the work. On app start (`HushApplication.onCreate`), if the mode is `DAILY_SUMMARY`, enqueue with `ExistingWorkPolicy.KEEP` in case the work was lost.
+- The worker is a thin adapter around `DailySummaryRunner` (plain Kotlin, JVM-tested). It counts blocked calls since "last summary at" with a SQL query, so a late run never skips or double-counts calls. It posts nothing if the count is zero or the notification permission is missing. In every case it then stores "last summary at" as now and enqueues the next run for the following 20:00 with `ExistingWorkPolicy.APPEND_OR_REPLACE`: `REPLACE` would cancel the run that is still in progress. A run that starts after the mode changed does nothing.
 - Android can delay the run (Doze, App Standby Buckets, battery saver). That is acceptable. Never use exact alarms (`SCHEDULE_EXACT_ALARM`, `USE_EXACT_ALARM`).
 - Create the `WorkManager` dependency in `AppContainer` and pass it to the code that schedules work. Test the worker with `work-testing` (`TestListenableWorkerBuilder`).
 

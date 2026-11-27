@@ -37,6 +37,7 @@ class HomeScreenTest {
                     onBlockingChange = { changedTo = it },
                     onOpenHistory = {},
                     onOpenAllowlist = {},
+                    onOpenNotificationSettings = {},
                 )
             }
         }
@@ -60,6 +61,7 @@ class HomeScreenTest {
                     onBlockingChange = { changedTo = it },
                     onOpenHistory = {},
                     onOpenAllowlist = {},
+                    onOpenNotificationSettings = {},
                 )
             }
         }
@@ -83,6 +85,7 @@ class HomeScreenTest {
                     onBlockingChange = {},
                     onOpenHistory = { opened = true },
                     onOpenAllowlist = {},
+                    onOpenNotificationSettings = {},
                 )
             }
         }
@@ -102,11 +105,32 @@ class HomeScreenTest {
                     onBlockingChange = {},
                     onOpenHistory = {},
                     onOpenAllowlist = { opened = true },
+                    onOpenNotificationSettings = {},
                 )
             }
         }
 
         composeRule.onNodeWithText(string(R.string.allowlist_title)).performClick()
+
+        assertTrue(opened)
+    }
+
+    @Test
+    fun notificationsButtonOpensTheNotificationSettings() {
+        var opened = false
+        composeRule.setContent {
+            HushTheme {
+                HomeScreen(
+                    uiState = HomeUiState(isLoading = false, blockingEnabled = true),
+                    onBlockingChange = {},
+                    onOpenHistory = {},
+                    onOpenAllowlist = {},
+                    onOpenNotificationSettings = { opened = true },
+                )
+            }
+        }
+
+        composeRule.onNodeWithText(string(R.string.notification_settings_title)).performClick()
 
         assertTrue(opened)
     }

@@ -2,6 +2,8 @@ package com.iancovski.hush.ui.setup
 
 import com.iancovski.hush.data.NotificationMode
 import com.iancovski.hush.data.SettingsRepository
+import com.iancovski.hush.notifications.NotificationModeController
+import com.iancovski.hush.testing.FakeSummaryScheduler
 import com.iancovski.hush.testing.MainDispatcherRule
 import com.iancovski.hush.testing.testDataStore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,7 +29,7 @@ class NotificationsSetupViewModelTest {
     val folder = TemporaryFolder()
 
     private fun TestScope.createViewModel(repository: SettingsRepository): NotificationsSetupViewModel {
-        val viewModel = NotificationsSetupViewModel(repository)
+        val viewModel = NotificationsSetupViewModel(NotificationModeController(repository, FakeSummaryScheduler()))
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.uiState.collect {} }
         return viewModel
     }

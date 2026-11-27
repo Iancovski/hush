@@ -62,6 +62,26 @@
     <string name="allowlist_remove_dialog_text">As chamadas de %1$s voltarão a ser bloqueadas se o número não estiver nos seus contatos.</string>
     <string name="allowlist_remove_confirm">Remover</string>
 
+    <!-- Notifications -->
+    <string name="notification_channel_blocked_calls">Chamadas bloqueadas</string>
+    <string name="notification_channel_blocked_calls_description">Uma notificação para cada chamada bloqueada.</string>
+    <string name="notification_channel_daily_summary">Resumo diário</string>
+    <string name="notification_channel_daily_summary_description">Quantas chamadas foram bloqueadas desde o último resumo, por volta das 20h.</string>
+    <string name="notification_blocked_call_title">Chamada bloqueada</string>
+    <string name="notification_blocked_call_text">%1$s às %2$s</string>
+    <string name="notification_daily_summary_title">Resumo diário</string>
+    <plurals name="notification_daily_summary_text">
+        <item quantity="one">O Hush bloqueou %d chamada desde o último resumo.</item>
+        <item quantity="many">O Hush bloqueou %d chamadas desde o último resumo.</item>
+        <item quantity="other">O Hush bloqueou %d chamadas desde o último resumo.</item>
+    </plurals>
+
+    <!-- Notification settings -->
+    <string name="notification_settings_title">Notificações</string>
+    <string name="notification_settings_description">Escolha como o Hush avisa sobre as chamadas bloqueadas.</string>
+    <string name="notification_settings_disabled">As notificações do Hush estão desativadas no Android, então você não vai recebê-las.</string>
+    <string name="notification_settings_enable">Ativar</string>
+
     <!-- Permissions -->
     <string name="permission_call_screening_title">App identificador de chamada e spam</string>
     <string name="permission_call_screening_reason">Verifica cada chamada recebida antes de o telefone tocar.</string>

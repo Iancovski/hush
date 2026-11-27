@@ -45,4 +45,14 @@ class BlockedCallRepositoryTest {
 
         assertTrue(repository.blockedCalls.first().isEmpty())
     }
+
+    @Test
+    fun `counting returns only calls blocked after the given time`() = runTest {
+        val repository = BlockedCallRepository(dao, normalizeNumber = { null })
+        repository.record(number = "1", receivedAt = 1_000L)
+        repository.record(number = "2", receivedAt = 2_000L)
+        repository.record(number = "3", receivedAt = 3_000L)
+
+        assertEquals(2, repository.countSince(1_000L))
+    }
 }

@@ -51,4 +51,14 @@ class BlockedCallDaoTest {
 
         assertEquals(emptyList<BlockedCall>(), dao.observeAll().first())
     }
+
+    @Test
+    fun countSinceCountsOnlyLaterCalls() = runTest {
+        dao.insert(BlockedCall(number = "1", normalizedNumber = null, receivedAt = 1_000L))
+        dao.insert(BlockedCall(number = "2", normalizedNumber = null, receivedAt = 2_000L))
+        dao.insert(BlockedCall(number = "3", normalizedNumber = null, receivedAt = 3_000L))
+
+        assertEquals(2, dao.countSince(1_000L))
+        assertEquals(0, dao.countSince(3_000L))
+    }
 }

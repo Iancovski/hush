@@ -20,6 +20,8 @@ import com.iancovski.hush.ui.history.HistoryScreen
 import com.iancovski.hush.ui.history.HistoryViewModel
 import com.iancovski.hush.ui.home.HomeScreen
 import com.iancovski.hush.ui.home.HomeViewModel
+import com.iancovski.hush.ui.notifications.NotificationSettingsRoute
+import com.iancovski.hush.ui.notifications.NotificationSettingsViewModel
 import com.iancovski.hush.ui.setup.NotificationsSetupRoute
 import com.iancovski.hush.ui.setup.NotificationsSetupViewModel
 import com.iancovski.hush.ui.setup.PermissionsRoute
@@ -30,6 +32,8 @@ import com.iancovski.hush.ui.setup.WelcomeScreen
 fun HushNavDisplay(
     setupCompleted: Boolean,
     container: AppContainer,
+    openHistoryRequested: Boolean,
+    onHistoryOpened: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val backStack = rememberNavBackStack(if (setupCompleted) Home else SetupWelcome)
@@ -38,6 +42,14 @@ fun HushNavDisplay(
     // back stack keeps Back from returning to the wizard.
     LaunchedEffect(setupCompleted) {
         if (setupCompleted) backStack.replaceSetupWithHome()
+    }
+
+    // A notification was tapped: show the history, with Home under it so Back leads there.
+    LaunchedEffect(openHistoryRequested, setupCompleted) {
+        if (openHistoryRequested && setupCompleted) {
+            backStack.showHistoryOverHome()
+            onHistoryOpened()
+        }
     }
 
     NavDisplay(
@@ -67,7 +79,7 @@ fun HushNavDisplay(
             }
             entry<SetupNotifications> {
                 val viewModel: NotificationsSetupViewModel = viewModel(
-                    factory = NotificationsSetupViewModel.factory(container.settingsRepository),
+                    factory = NotificationsSetupViewModel.factory(container.notificationModeController),
                 )
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                 NotificationsSetupRoute(
@@ -86,6 +98,7 @@ fun HushNavDisplay(
                     onBlockingChange = viewModel::onBlockingChange,
                     onOpenHistory = { backStack.add(History) },
                     onOpenAllowlist = { backStack.add(Allowlist) },
+                    onOpenNotificationSettings = { backStack.add(NotificationSettings) },
                 )
             }
             entry<History> {
@@ -97,6 +110,20 @@ fun HushNavDisplay(
                     uiState = uiState,
                     onBackClick = { backStack.removeLastOrNull() },
                     onClearHistory = viewModel::onClearHistory,
+                )
+            }
+            entry<NotificationSettings> {
+                val viewModel: NotificationSettingsViewModel = viewModel(
+                    factory = NotificationSettingsViewModel.factory(
+                        container.settingsRepository,
+                        container.notificationModeController,
+                    ),
+                )
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                NotificationSettingsRoute(
+                    uiState = uiState,
+                    onBackClick = { backStack.removeLastOrNull() },
+                    onNotificationModeSelect = viewModel::onNotificationModeSelect,
                 )
             }
             entry<Allowlist> {
@@ -126,4 +153,12 @@ private fun NavBackStack<NavKey>.replaceSetupWithHome() {
     // Add before removing so the back stack is never empty, which NavDisplay does not allow.
     add(Home)
     removeAll { it != Home }
+}
+
+private fun NavBackStack<NavKey>.showHistoryOverHome() {
+    if (lastOrNull() == History) return
+    // Add before removing so the back stack is never empty, which NavDisplay does not allow.
+    add(History)
+    removeAll { it != History }
+    add(0, Home)
 }

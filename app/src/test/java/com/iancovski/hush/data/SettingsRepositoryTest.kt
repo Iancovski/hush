@@ -70,4 +70,24 @@ class SettingsRepositoryTest {
 
         assertNull(dataStore.data.first()[lastSummaryAtKey])
     }
+
+    @Test
+    fun `there is no last summary time until one is stored`() = runTest {
+        val repository = SettingsRepository(testDataStore(folder))
+        assertNull(repository.lastSummaryAt())
+
+        repository.setLastSummaryAt(5_000L)
+
+        assertEquals(5_000L, repository.lastSummaryAt())
+    }
+
+    @Test
+    fun `changing to the daily summary stores now as the last summary time`() = runTest {
+        val repository = SettingsRepository(testDataStore(folder), currentTimeMillis = { 1_234L })
+
+        repository.setNotificationMode(NotificationMode.DAILY_SUMMARY)
+
+        assertEquals(NotificationMode.DAILY_SUMMARY, repository.settings.first().notificationMode)
+        assertEquals(1_234L, repository.lastSummaryAt())
+    }
 }

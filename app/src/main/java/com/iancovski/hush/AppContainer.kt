@@ -3,11 +3,18 @@ package com.iancovski.hush
 import android.content.Context
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
+import androidx.work.WorkManager
 import com.iancovski.hush.data.AllowlistRepository
 import com.iancovski.hush.data.BlockedCallRepository
 import com.iancovski.hush.data.HushDatabase
 import com.iancovski.hush.data.PhoneNumberNormalizer
 import com.iancovski.hush.data.SettingsRepository
+import com.iancovski.hush.notifications.AndroidNotifier
+import com.iancovski.hush.notifications.BlockedCallAlerts
+import com.iancovski.hush.notifications.DailySummaryRunner
+import com.iancovski.hush.notifications.NotificationModeController
+import com.iancovski.hush.notifications.SummaryScheduler
+import com.iancovski.hush.notifications.WorkManagerSummaryScheduler
 import com.iancovski.hush.permissions.AndroidPermissionsChecker
 import com.iancovski.hush.permissions.PermissionsChecker
 import com.iancovski.hush.screening.AndroidContactLookup
@@ -54,6 +61,26 @@ class AppContainer(
 
     val permissionsChecker: PermissionsChecker by lazy {
         AndroidPermissionsChecker(appContext)
+    }
+
+    val notifier: AndroidNotifier by lazy {
+        AndroidNotifier(appContext)
+    }
+
+    val blockedCallAlerts: BlockedCallAlerts by lazy {
+        BlockedCallAlerts(settingsRepository, notifier)
+    }
+
+    private val summaryScheduler: SummaryScheduler by lazy {
+        WorkManagerSummaryScheduler(WorkManager.getInstance(appContext))
+    }
+
+    val notificationModeController: NotificationModeController by lazy {
+        NotificationModeController(settingsRepository, summaryScheduler)
+    }
+
+    val dailySummaryRunner: DailySummaryRunner by lazy {
+        DailySummaryRunner(settingsRepository, blockedCallRepository, notifier, summaryScheduler)
     }
 
     val callScreener: CallScreener by lazy {

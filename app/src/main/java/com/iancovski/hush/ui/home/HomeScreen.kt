@@ -42,13 +42,14 @@ import com.iancovski.hush.ui.theme.cardGradient
 import com.iancovski.hush.ui.theme.cardHighlight
 import com.iancovski.hush.ui.theme.success
 
-/** Main screen: the switch that turns call blocking on or off, and the way into the history and allowlist. */
+/** Main screen: the switch that turns call blocking on or off, and the way into the other screens. */
 @Composable
 fun HomeScreen(
     uiState: HomeUiState,
     onBlockingChange: (Boolean) -> Unit,
     onOpenHistory: () -> Unit,
     onOpenAllowlist: () -> Unit,
+    onOpenNotificationSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(modifier = modifier) { innerPadding ->
@@ -87,6 +88,15 @@ fun HomeScreen(
                         iconRes = R.drawable.ic_person,
                         label = stringResource(R.string.allowlist_title),
                         onClick = onOpenAllowlist,
+                    )
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                    )
+                    HomeMenuItem(
+                        iconRes = R.drawable.ic_notifications,
+                        label = stringResource(R.string.notification_settings_title),
+                        onClick = onOpenNotificationSettings,
                     )
                 }
             }
@@ -217,6 +227,7 @@ private fun HomeScreenEnabledPreview() {
             onBlockingChange = {},
             onOpenHistory = {},
             onOpenAllowlist = {},
+            onOpenNotificationSettings = {},
         )
     }
 }
@@ -230,6 +241,7 @@ private fun HomeScreenDisabledPreview() {
             onBlockingChange = {},
             onOpenHistory = {},
             onOpenAllowlist = {},
+            onOpenNotificationSettings = {},
         )
     }
 }

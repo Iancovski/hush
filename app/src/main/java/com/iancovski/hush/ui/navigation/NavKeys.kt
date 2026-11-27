@@ -24,3 +24,6 @@ data object History : NavKey
 
 @Serializable
 data object Allowlist : NavKey
+
+@Serializable
+data object NotificationSettings : NavKey

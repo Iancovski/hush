@@ -36,6 +36,7 @@ class HushCallScreeningService : CallScreeningService() {
             }
             if (decision == ScreeningDecision.Block) {
                 recordBlockedCall(call.number, receivedAt = callDetails.creationTimeMillis)
+                container.blockedCallAlerts.onCallBlocked(call.number, receivedAt = callDetails.creationTimeMillis)
             }
         }
     }

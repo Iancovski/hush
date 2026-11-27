@@ -1,5 +1,7 @@
 <resources>
-    <!-- Window and launcher colors only. In-app colors live in ui/theme/Color.kt. -->
+    <!-- Colors used outside Compose only: window, launcher and notifications. In-app colors live in
+         ui/theme/Color.kt. -->
     <color name="window_background">#1C1B24</color>
     <color name="ic_launcher_background">#7B5CFF</color>
+    <color name="notification_accent">#7B5CFF</color>
 </resources>

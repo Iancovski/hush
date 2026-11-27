@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.io.IOException
 
@@ -36,6 +37,20 @@ class SettingsRepository(
 
     suspend fun setBlockingEnabled(enabled: Boolean) {
         dataStore.edit { preferences -> preferences[Keys.BLOCKING_ENABLED] = enabled }
+    }
+
+    suspend fun setNotificationMode(mode: NotificationMode) {
+        dataStore.edit { preferences -> preferences.setNotificationMode(mode) }
+    }
+
+    /** When the last daily summary covered calls up to, or null if there was none yet. */
+    suspend fun lastSummaryAt(): Long? =
+        dataStore.data
+            .catch { exception -> if (exception is IOException) emit(emptyPreferences()) else throw exception }
+            .first()[Keys.LAST_SUMMARY_AT]
+
+    suspend fun setLastSummaryAt(epochMillis: Long) {
+        dataStore.edit { preferences -> preferences[Keys.LAST_SUMMARY_AT] = epochMillis }
     }
 
     private fun MutablePreferences.setNotificationMode(mode: NotificationMode) {

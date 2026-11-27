@@ -64,6 +64,25 @@
     <string name="allowlist_remove_dialog_text">Calls from %1$s will be blocked again if it is not in your contacts.</string>
     <string name="allowlist_remove_confirm">Remove</string>
 
+    <!-- Notifications -->
+    <string name="notification_channel_blocked_calls">Blocked calls</string>
+    <string name="notification_channel_blocked_calls_description">One notification for each blocked call.</string>
+    <string name="notification_channel_daily_summary">Daily summary</string>
+    <string name="notification_channel_daily_summary_description">How many calls were blocked since the previous summary, around 8 PM.</string>
+    <string name="notification_blocked_call_title">Call blocked</string>
+    <string name="notification_blocked_call_text">%1$s at %2$s</string>
+    <string name="notification_daily_summary_title">Daily summary</string>
+    <plurals name="notification_daily_summary_text">
+        <item quantity="one">Hush blocked %d call since the last summary.</item>
+        <item quantity="other">Hush blocked %d calls since the last summary.</item>
+    </plurals>
+
+    <!-- Notification settings -->
+    <string name="notification_settings_title">Notifications</string>
+    <string name="notification_settings_description">Choose how Hush tells you about blocked calls.</string>
+    <string name="notification_settings_disabled">Notifications for Hush are turned off in Android, so you will not get any.</string>
+    <string name="notification_settings_enable">Turn on</string>
+
     <!-- Permissions -->
     <string name="permission_call_screening_title">Caller ID &amp; spam app</string>
     <string name="permission_call_screening_reason">Checks each incoming call before the phone rings.</string>
