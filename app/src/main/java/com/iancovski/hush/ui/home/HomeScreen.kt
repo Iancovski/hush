@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -41,12 +42,13 @@ import com.iancovski.hush.ui.theme.cardGradient
 import com.iancovski.hush.ui.theme.cardHighlight
 import com.iancovski.hush.ui.theme.success
 
-/** Main screen: the switch that turns call blocking on or off, and the way into the history. */
+/** Main screen: the switch that turns call blocking on or off, and the way into the history and allowlist. */
 @Composable
 fun HomeScreen(
     uiState: HomeUiState,
     onBlockingChange: (Boolean) -> Unit,
     onOpenHistory: () -> Unit,
+    onOpenAllowlist: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Scaffold(modifier = modifier) { innerPadding ->
@@ -76,6 +78,15 @@ fun HomeScreen(
                         iconRes = R.drawable.ic_history,
                         label = stringResource(R.string.history_title),
                         onClick = onOpenHistory,
+                    )
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                    )
+                    HomeMenuItem(
+                        iconRes = R.drawable.ic_person,
+                        label = stringResource(R.string.allowlist_title),
+                        onClick = onOpenAllowlist,
                     )
                 }
             }
@@ -205,6 +216,7 @@ private fun HomeScreenEnabledPreview() {
             uiState = HomeUiState(isLoading = false, blockingEnabled = true),
             onBlockingChange = {},
             onOpenHistory = {},
+            onOpenAllowlist = {},
         )
     }
 }
@@ -217,6 +229,7 @@ private fun HomeScreenDisabledPreview() {
             uiState = HomeUiState(isLoading = false, blockingEnabled = false),
             onBlockingChange = {},
             onOpenHistory = {},
+            onOpenAllowlist = {},
         )
     }
 }

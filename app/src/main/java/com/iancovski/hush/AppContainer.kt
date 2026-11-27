@@ -3,6 +3,7 @@ package com.iancovski.hush
 import android.content.Context
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
+import com.iancovski.hush.data.AllowlistRepository
 import com.iancovski.hush.data.BlockedCallRepository
 import com.iancovski.hush.data.HushDatabase
 import com.iancovski.hush.data.PhoneNumberNormalizer
@@ -11,7 +12,7 @@ import com.iancovski.hush.permissions.AndroidPermissionsChecker
 import com.iancovski.hush.permissions.PermissionsChecker
 import com.iancovski.hush.screening.AndroidContactLookup
 import com.iancovski.hush.screening.CallScreener
-import com.iancovski.hush.screening.SettingsSnapshot
+import com.iancovski.hush.screening.ScreeningSnapshot
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -39,8 +40,16 @@ class AppContainer(
         SettingsRepository(appContext.settingsDataStore)
     }
 
+    private val phoneNumberNormalizer: PhoneNumberNormalizer by lazy {
+        PhoneNumberNormalizer(appContext)
+    }
+
     val blockedCallRepository: BlockedCallRepository by lazy {
-        BlockedCallRepository(database.blockedCallDao(), PhoneNumberNormalizer(appContext)::toE164)
+        BlockedCallRepository(database.blockedCallDao(), phoneNumberNormalizer::toE164)
+    }
+
+    val allowlistRepository: AllowlistRepository by lazy {
+        AllowlistRepository(database.allowedNumberDao(), phoneNumberNormalizer::toE164)
     }
 
     val permissionsChecker: PermissionsChecker by lazy {
@@ -49,8 +58,13 @@ class AppContainer(
 
     val callScreener: CallScreener by lazy {
         CallScreener(
-            settingsSnapshot = SettingsSnapshot(settingsRepository.settings, applicationScope),
+            snapshot = ScreeningSnapshot(
+                settings = settingsRepository.settings,
+                allowedNumbers = allowlistRepository.normalizedNumbers,
+                scope = applicationScope,
+            ),
             contactLookup = AndroidContactLookup(appContext),
+            normalizeNumber = phoneNumberNormalizer::toE164,
         )
     }
 }

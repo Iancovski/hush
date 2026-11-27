@@ -44,6 +44,26 @@
     <string name="history_clear_dialog_text">All blocked calls will be removed from Hush. This cannot be undone.</string>
     <string name="history_clear_confirm">Clear</string>
 
+    <!-- Allowlist -->
+    <string name="allowlist_title">Allowed numbers</string>
+    <string name="allowlist_description">Numbers on this list can always call you, even if they are not in your contacts.</string>
+    <string name="allowlist_empty_title">No allowed numbers</string>
+    <string name="allowlist_empty_description">Add numbers that can call you without being saved in your contacts.</string>
+    <string name="allowlist_add">Add number</string>
+    <string name="allowlist_number_label">Phone number</string>
+    <string name="allowlist_number_hint">Include the area code</string>
+    <string name="allowlist_name_label">Name (optional)</string>
+    <string name="allowlist_add_confirm">Add</string>
+    <string name="allowlist_error_invalid">Enter a valid phone number, with the area code</string>
+    <string name="allowlist_error_duplicate">This number is already on the list</string>
+    <string name="allowlist_edit">Edit %1$s</string>
+    <string name="allowlist_edit_dialog_title">Edit number</string>
+    <string name="allowlist_save">Save</string>
+    <string name="allowlist_remove">Remove %1$s</string>
+    <string name="allowlist_remove_dialog_title">Remove number?</string>
+    <string name="allowlist_remove_dialog_text">Calls from %1$s will be blocked again if it is not in your contacts.</string>
+    <string name="allowlist_remove_confirm">Remove</string>
+
     <!-- Permissions -->
     <string name="permission_call_screening_title">Caller ID &amp; spam app</string>
     <string name="permission_call_screening_reason">Checks each incoming call before the phone rings.</string>

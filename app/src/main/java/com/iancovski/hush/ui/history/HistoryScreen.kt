@@ -172,7 +172,7 @@ private fun BlockedCallList(
                 BlockedCallItem(call = call, zone = zone)
                 if (index < day.calls.lastIndex) {
                     HorizontalDivider(
-                        modifier = Modifier.padding(start = 80.dp, end = 24.dp),
+                        modifier = Modifier.padding(horizontal = 24.dp),
                         color = MaterialTheme.colorScheme.outlineVariant,
                     )
                 }

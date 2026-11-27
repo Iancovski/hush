@@ -36,6 +36,7 @@ class HomeScreenTest {
                     uiState = HomeUiState(isLoading = false, blockingEnabled = true),
                     onBlockingChange = { changedTo = it },
                     onOpenHistory = {},
+                    onOpenAllowlist = {},
                 )
             }
         }
@@ -58,6 +59,7 @@ class HomeScreenTest {
                     uiState = HomeUiState(isLoading = false, blockingEnabled = false),
                     onBlockingChange = { changedTo = it },
                     onOpenHistory = {},
+                    onOpenAllowlist = {},
                 )
             }
         }
@@ -80,11 +82,31 @@ class HomeScreenTest {
                     uiState = HomeUiState(isLoading = false, blockingEnabled = true),
                     onBlockingChange = {},
                     onOpenHistory = { opened = true },
+                    onOpenAllowlist = {},
                 )
             }
         }
 
         composeRule.onNodeWithText(string(R.string.history_title)).performClick()
+
+        assertTrue(opened)
+    }
+
+    @Test
+    fun allowlistButtonOpensTheAllowlist() {
+        var opened = false
+        composeRule.setContent {
+            HushTheme {
+                HomeScreen(
+                    uiState = HomeUiState(isLoading = false, blockingEnabled = true),
+                    onBlockingChange = {},
+                    onOpenHistory = {},
+                    onOpenAllowlist = { opened = true },
+                )
+            }
+        }
+
+        composeRule.onNodeWithText(string(R.string.allowlist_title)).performClick()
 
         assertTrue(opened)
     }

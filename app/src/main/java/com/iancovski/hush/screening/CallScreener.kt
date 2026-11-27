@@ -25,16 +25,20 @@ interface ContactLookup {
  * legitimate call.
  */
 class CallScreener(
-    private val settingsSnapshot: SettingsSnapshot,
+    private val snapshot: ScreeningSnapshot,
     private val contactLookup: ContactLookup,
+    /** E.164 conversion, the same one used when numbers are added to the allowlist. */
+    private val normalizeNumber: (String) -> String?,
 ) {
 
     suspend fun screen(call: IncomingCall): ScreeningDecision {
         if (!call.isIncoming) return ScreeningDecision.Allow
-        val settings = settingsSnapshot.current() ?: return ScreeningDecision.Allow
-        if (!settings.blockingEnabled) return ScreeningDecision.Allow
-        // A hidden number can never match a contact.
+        val state = snapshot.current() ?: return ScreeningDecision.Allow
+        if (!state.settings.blockingEnabled) return ScreeningDecision.Allow
+        // A hidden number can never match the allowlist or a contact.
         val number = call.number ?: return ScreeningDecision.Block
+        // The allowlist is in memory, so it is checked before the contacts query.
+        if (normalizeNumber(number) in state.allowedNumbers) return ScreeningDecision.Allow
         return when (contactLookup.isSavedContact(number)) {
             false -> ScreeningDecision.Block
             true, null -> ScreeningDecision.Allow

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Material Symbols "add", outlined, weight 300, 24px (google/material-design-icons, Apache 2.0). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="960"
+    android:viewportHeight="960">
+    <!-- The official SVG uses viewBox="0 -960 960 960", so the path is kept as is and moved down. -->
+    <group android:translateY="960">
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M450-450H220v-60h230v-230h60v230h230v60H510v230h-60v-230Z" />
+    </group>
+</vector>

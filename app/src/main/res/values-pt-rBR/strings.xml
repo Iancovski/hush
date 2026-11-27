@@ -42,6 +42,26 @@
     <string name="history_clear_dialog_text">Todas as chamadas bloqueadas serão removidas do Hush. Isso não pode ser desfeito.</string>
     <string name="history_clear_confirm">Limpar</string>
 
+    <!-- Allowlist -->
+    <string name="allowlist_title">Exceções</string>
+    <string name="allowlist_description">Os números desta lista sempre podem ligar, mesmo que não estejam nos seus contatos.</string>
+    <string name="allowlist_empty_title">Nenhuma exceção</string>
+    <string name="allowlist_empty_description">Adicione números que podem ligar mesmo sem estar nos seus contatos.</string>
+    <string name="allowlist_add">Adicionar número</string>
+    <string name="allowlist_number_label">Número de telefone</string>
+    <string name="allowlist_number_hint">Inclua o DDD</string>
+    <string name="allowlist_name_label">Nome (opcional)</string>
+    <string name="allowlist_add_confirm">Adicionar</string>
+    <string name="allowlist_error_invalid">Digite um número válido, com DDD</string>
+    <string name="allowlist_error_duplicate">Este número já está na lista</string>
+    <string name="allowlist_edit">Editar %1$s</string>
+    <string name="allowlist_edit_dialog_title">Editar número</string>
+    <string name="allowlist_save">Salvar</string>
+    <string name="allowlist_remove">Remover %1$s</string>
+    <string name="allowlist_remove_dialog_title">Remover exceção?</string>
+    <string name="allowlist_remove_dialog_text">As chamadas de %1$s voltarão a ser bloqueadas se o número não estiver nos seus contatos.</string>
+    <string name="allowlist_remove_confirm">Remover</string>
+
     <!-- Permissions -->
     <string name="permission_call_screening_title">App identificador de chamada e spam</string>
     <string name="permission_call_screening_reason">Verifica cada chamada recebida antes de o telefone tocar.</string>

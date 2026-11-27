@@ -14,6 +14,8 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.iancovski.hush.AppContainer
+import com.iancovski.hush.ui.allowlist.AllowlistScreen
+import com.iancovski.hush.ui.allowlist.AllowlistViewModel
 import com.iancovski.hush.ui.history.HistoryScreen
 import com.iancovski.hush.ui.history.HistoryViewModel
 import com.iancovski.hush.ui.home.HomeScreen
@@ -83,6 +85,7 @@ fun HushNavDisplay(
                     uiState = uiState,
                     onBlockingChange = viewModel::onBlockingChange,
                     onOpenHistory = { backStack.add(History) },
+                    onOpenAllowlist = { backStack.add(Allowlist) },
                 )
             }
             entry<History> {
@@ -94,6 +97,24 @@ fun HushNavDisplay(
                     uiState = uiState,
                     onBackClick = { backStack.removeLastOrNull() },
                     onClearHistory = viewModel::onClearHistory,
+                )
+            }
+            entry<Allowlist> {
+                val viewModel: AllowlistViewModel = viewModel(
+                    factory = AllowlistViewModel.factory(container.allowlistRepository),
+                )
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                AllowlistScreen(
+                    uiState = uiState,
+                    onBackClick = { backStack.removeLastOrNull() },
+                    onAddClick = viewModel::onAddClick,
+                    onEditClick = viewModel::onEditClick,
+                    onDialogInputChange = viewModel::onDialogInputChange,
+                    onDialogConfirm = viewModel::onDialogConfirm,
+                    onDialogDismiss = viewModel::onDialogDismiss,
+                    onRemoveClick = viewModel::onRemoveClick,
+                    onRemoveConfirm = viewModel::onRemoveConfirm,
+                    onRemoveDismiss = viewModel::onRemoveDismiss,
                 )
             }
         },

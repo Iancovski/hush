@@ -54,6 +54,8 @@ A counter with the number of calls blocked in the last 7 days.
 A list of numbers that are never blocked, even if they are not saved in the contacts. Useful for numbers the user wants to receive calls from without adding them as contacts. The list is empty by default.
 
 - The user adds a number by typing it, with an optional name to identify it. A number can also be added straight from the history, by selecting a blocked call.
+- The user can edit a number or its name, for example to fix a typo.
+- The user can remove a number from the list. After that, calls from it are blocked again unless it is saved in the contacts.
 
 ### Notifications
 

@@ -21,3 +21,6 @@ data object Home : NavKey
 
 @Serializable
 data object History : NavKey
+
+@Serializable
+data object Allowlist : NavKey

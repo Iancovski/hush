@@ -1,6 +1,7 @@
 package com.iancovski.hush.screening
 
 import com.iancovski.hush.data.Settings
+import com.iancovski.hush.testing.fakeNormalizeNumber
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -15,13 +16,20 @@ class CallScreenerTest {
         private val savedNumbers: Set<String> = emptySet(),
         private val readable: Boolean = true,
     ) : ContactLookup {
-        override fun isSavedContact(number: String): Boolean? = if (readable) number in savedNumbers else null
+        var lookups = 0
+            private set
+
+        override fun isSavedContact(number: String): Boolean? {
+            lookups++
+            return if (readable) number in savedNumbers else null
+        }
     }
 
     private fun TestScope.screener(
         settings: Flow<Settings> = MutableStateFlow(Settings()),
+        allowedNumbers: Flow<Set<String>> = MutableStateFlow(emptySet()),
         contacts: ContactLookup = FakeContactLookup(savedNumbers = setOf(SAVED_NUMBER)),
-    ) = CallScreener(SettingsSnapshot(settings, backgroundScope), contacts)
+    ) = CallScreener(ScreeningSnapshot(settings, allowedNumbers, backgroundScope), contacts, ::fakeNormalizeNumber)
 
     private fun incoming(number: String?) = IncomingCall(isIncoming = true, number = number)
 
@@ -37,6 +45,26 @@ class CallScreenerTest {
         val decision = screener().screen(incoming(SAVED_NUMBER))
 
         assertEquals(ScreeningDecision.Allow, decision)
+    }
+
+    @Test
+    fun `allowed number is allowed even if it is not a contact`() = runTest {
+        val screener = screener(allowedNumbers = MutableStateFlow(setOf("+551130001234")))
+
+        // The call arrives in another format: matching uses the normalized form.
+        val decision = screener.screen(incoming("(11) 3000-1234"))
+
+        assertEquals(ScreeningDecision.Allow, decision)
+    }
+
+    @Test
+    fun `allowed number does not need the contacts query`() = runTest {
+        val contacts = FakeContactLookup()
+        val screener = screener(allowedNumbers = MutableStateFlow(setOf("+551130001234")), contacts = contacts)
+
+        screener.screen(incoming("+5511 3000-1234"))
+
+        assertEquals(0, contacts.lookups)
     }
 
     @Test
@@ -69,8 +97,8 @@ class CallScreenerTest {
     }
 
     @Test
-    fun `call is allowed when settings are not loaded in time`() = runTest {
-        val screener = screener(settings = emptyFlow())
+    fun `call is allowed when the screening state is not loaded in time`() = runTest {
+        val screener = screener(allowedNumbers = emptyFlow())
 
         assertEquals(ScreeningDecision.Allow, screener.screen(incoming(UNKNOWN_NUMBER)))
     }
