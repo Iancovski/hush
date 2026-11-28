@@ -55,6 +55,9 @@ import com.iancovski.hush.ui.theme.cardGradient
 import com.iancovski.hush.ui.theme.cardHighlight
 import com.iancovski.hush.ui.theme.success
 
+// The gap between the cards matches the side margin, so the layout reads as one even grid.
+private val ScreenMargin = 16.dp
+
 /** Main screen: the switch that turns call blocking on or off, and the way into the other screens. */
 @Composable
 fun HomeScreen(
@@ -73,7 +76,7 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 16.dp),
+                .padding(horizontal = ScreenMargin, vertical = 16.dp),
         ) {
             Text(
                 text = stringResource(R.string.app_name),
@@ -89,13 +92,13 @@ fun HomeScreen(
                     permissionsMissing = !uiState.permissions.allGranted,
                     onEnabledChange = onBlockingChange,
                 )
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(ScreenMargin))
                 BlockedCallsCard(
                     blockedPerDay = uiState.blockedPerDay,
                     total = uiState.blockedLastSevenDays,
                     onClick = onOpenHistory,
                 )
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(ScreenMargin))
                 HomeCard(highlighted = false) {
                     HomeMenuItem(
                         iconRes = R.drawable.ic_history,

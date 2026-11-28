@@ -132,6 +132,8 @@ Gradle runs on the JDK bundled with Android Studio (`JAVA_HOME` points to `Andro
 - Create the back stack with `rememberNavBackStack(...)` and render it with `NavDisplay` plus the `entryProvider { entry<Key> { ... } }` DSL.
 - Add `rememberSaveableStateHolderNavEntryDecorator()` and `rememberViewModelStoreNavEntryDecorator()` so each entry gets its own saved state and ViewModel scope.
 - Screens receive navigation as callbacks (`onOpenSettings: () -> Unit`), never the back stack itself.
+- A screen's back callback removes only that screen, and only while it is on top. A screen stays tappable during its exit animation, so a plain `removeLastOrNull()` lets a fast double tap empty the back stack, which crashes `NavDisplay`.
+- Screens slide horizontally: forward enters from the right, back (including the system back gesture and button, through `predictivePopTransitionSpec`) leaves to the right. The default predictive back transition shrinks the screen and is not used.
 - The back stack starts at the setup wizard until setup is completed, and at Home after that. Finishing the wizard replaces the back stack, so Back never returns to it.
 
 ### Room

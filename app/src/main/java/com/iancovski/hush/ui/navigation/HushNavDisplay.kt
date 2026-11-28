@@ -1,5 +1,9 @@
 package com.iancovski.hush.ui.navigation
 
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -54,12 +58,16 @@ fun HushNavDisplay(
 
     NavDisplay(
         backStack = backStack,
-        onBack = { backStack.removeLastOrNull() },
+        onBack = { backStack.popToPrevious() },
         modifier = modifier,
         entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator(),
             rememberViewModelStoreNavEntryDecorator(),
         ),
+        transitionSpec = { slideForward() },
+        popTransitionSpec = { slideBack() },
+        // The default for the back gesture shrinks the screen away, which looks broken next to the slides.
+        predictivePopTransitionSpec = { slideBack() },
         entryProvider = entryProvider {
             entry<SetupWelcome> {
                 WelcomeScreen(onStartClick = { backStack.add(SetupPermissions) })
@@ -117,7 +125,7 @@ fun HushNavDisplay(
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                 HistoryRoute(
                     uiState = uiState,
-                    onBackClick = { backStack.removeLastOrNull() },
+                    onBackClick = { backStack.pop(History) },
                     onClearHistory = viewModel::onClearHistory,
                     onAddToAllowlistClick = viewModel::onAddToAllowlistClick,
                     onAllowlistDialogInputChange = viewModel::onAllowlistDialogInputChange,
@@ -136,7 +144,7 @@ fun HushNavDisplay(
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                 NotificationSettingsRoute(
                     uiState = uiState,
-                    onBackClick = { backStack.removeLastOrNull() },
+                    onBackClick = { backStack.pop(NotificationSettings) },
                     onNotificationModeSelect = viewModel::onNotificationModeSelect,
                 )
             }
@@ -147,7 +155,7 @@ fun HushNavDisplay(
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                 AllowlistScreen(
                     uiState = uiState,
-                    onBackClick = { backStack.removeLastOrNull() },
+                    onBackClick = { backStack.pop(Allowlist) },
                     onAddClick = viewModel::onAddClick,
                     onEditClick = viewModel::onEditClick,
                     onDialogInputChange = viewModel::onDialogInputChange,
@@ -160,6 +168,28 @@ fun HushNavDisplay(
             }
         },
     )
+}
+
+/** A new screen slides in from the right and pushes the current one out to the left. */
+private fun slideForward(): ContentTransform =
+    slideInHorizontally { width -> width } togetherWith slideOutHorizontally { width -> -width }
+
+/** Going back reverses [slideForward]: the top screen leaves to the right. */
+private fun slideBack(): ContentTransform =
+    slideInHorizontally { width -> -width } togetherWith slideOutHorizontally { width -> width }
+
+/**
+ * Closes [screen], if it is still the one on top. A screen stays visible and tappable while its
+ * exit animation runs, so a fast second tap on its back button would otherwise remove the screen
+ * under it too, down to an empty back stack, which crashes NavDisplay.
+ */
+private fun NavBackStack<NavKey>.pop(screen: NavKey) {
+    if (size > 1 && lastOrNull() == screen) removeAt(lastIndex)
+}
+
+/** System back: goes to the previous screen, never removing the last one. */
+private fun NavBackStack<NavKey>.popToPrevious() {
+    if (size > 1) removeAt(lastIndex)
 }
 
 private fun NavBackStack<NavKey>.replaceSetupWithHome() {
